@@ -31,7 +31,7 @@ a {
 text-decoration: none;
 }
 
-/* 顶部导航 磨砂玻璃科技风 */
+/* 顶部导航 磨砂玻璃科技风（整合带会徽版本） */
 header {
 width: 100%;
 position: fixed;
@@ -42,32 +42,63 @@ backdrop-filter: blur(14px);
 -webkit-backdrop-filter: blur(14px);
 border-bottom: 1px solid rgba(22, 93, 255, 0.1);
 z-index: 999;
+overflow: hidden;
 }
 .nav-wrap {
-max-width: 1320px;
-margin: 0 auto;
+width: 100%;
 height: 72px;
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 0 32px;
+padding: 0 32px 0 0;
 }
+/* 左侧logo整体容器：图片+同行文字 */
 .nav-logo {
-font-size: 24px;
-font-weight: 700;
-color: #165DFF;
-letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
 }
+/* 协会会徽，宽高22px，contain保证完整无裁剪 */
+.nav-header-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    align-self: center;
+}
+/* 校名+协会名横向排列 */
+.nav-logo-text {
+    display: flex;
+    flex-direction: row;
+    /* gap: 6px;*/
+    align-items: center;
+}
+/* 江西财经大学：黑色加粗 */
+.nav-top-text {
+    font-size: 25px;
+    color: #000000;
+    font-weight: bold;
+}
+/* 计算机协会：蓝色加粗 */
+.nav-bottom-text {
+    font-size: 25px;
+    color: #165DFF;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* 导航菜单 完全沿用原版交互 */
 .nav-menu {
 display: flex;
 gap: 20px;
 }
 .nav-menu a {
 color: #374151;
-font-size: 15px;
+font-size: 17px;
 padding: 8px 0;
 position: relative;
 transition: 0.25s ease;
+font-weight: 700; /* 加粗 */
 }
 .nav-menu a::after {
 content: "";
@@ -86,7 +117,7 @@ color: #165DFF;
 width: 100%;
 }
 
-/* 通用区块样式 */
+/* 通用区块样式（全部保留第一版） */
 .section {
 max-width: 1320px;
 margin: 120px auto;
@@ -111,7 +142,7 @@ background: linear-gradient(90deg,#165DFF,#60a5fa);
 border-radius: 2px;
 }
 
-/* 全局动画 */
+/* 全局动画 原样保留 */
 @keyframes textPop {
 0% {
 opacity: 0;
@@ -134,7 +165,7 @@ transform: translateY(0) scale(1);
 100% { transform: translateY(60px) scale(1.1); }
 }
 
-/* 页脚全局 */
+/* 页脚全局 原版不动 */
 footer {
 background: #0b1a33;
 color: #cbd5e1;
@@ -154,7 +185,7 @@ margin: 8px 0;
 opacity: 0.85;
 }
 
-/* 移动端公共基础 */
+/* 移动端公共适配 完整保留 */
 @media (max-width: 992px) {
 .nav-wrap {
 flex-direction: column;

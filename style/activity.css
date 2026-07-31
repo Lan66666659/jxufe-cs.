@@ -1,0 +1,64 @@
+.act-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 32px;
+}
+.act-card {
+background: rgba(255, 255, 255, 0.72);
+backdrop-filter: blur(18px);
+-webkit-backdrop-filter: blur(18px);
+border-radius: 18px;
+overflow: hidden;
+box-shadow:
+0 8px 32px rgba(22, 93, 255, 0.08),
+inset 0 1px 0 rgba(255, 255, 255, 0.8);
+border: 1px solid rgba(22, 93, 255, 0.12);
+transition: all 0.35s ease;
+}
+.act-card:hover {
+transform: translateY(-12px) scale(1.02);
+box-shadow:
+0 12px 40px rgba(22, 93, 255, 0.18),
+inset 0 1px 0 rgba(255, 255, 255, 0.8);
+border-color: rgba(22, 93, 255, 0.35);
+}
+.act-img-area {
+height: 190px;
+background: linear-gradient(145deg, #d0e1ff, #b0cfff);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #165DFF;
+font-size: 17px;
+overflow: hidden;
+}
+.act-img-area img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+}
+.act-text-area {
+padding: 26px;
+}
+.act-text-area h4 {
+font-size: 20px;
+margin-bottom: 12px;
+color: #0f2847;
+}
+.act-text-area p {
+font-size: 15px;
+line-height: 1.8;
+color: #64748b;
+}
+
+@media (max-width: 992px) {
+.act-grid {
+grid-template-columns: repeat(2, 1fr);
+}
+}
+@media (max-width: 600px) {
+.act-grid {
+grid-template-columns: 1fr;
+}
+}

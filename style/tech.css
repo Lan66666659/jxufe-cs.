@@ -1,0 +1,59 @@
+/* 计算机知识分享板块 */
+
+.tech-grid {
+
+display:grid;
+
+grid-template-columns: repeat(4,1fr);
+
+gap:28px;
+
+}
+
+.tech-card {
+
+background: rgba(255, 255, 255, 0.72);
+
+backdrop-filter: blur(18px);
+
+border-radius:18px;
+
+padding:28px 22px;
+
+border:1px solid rgba(22,93,255,0.12);
+
+box-shadow:0 8px 32px rgba(22,93,255,0.08);
+
+transition:0.35s ease;
+
+}
+
+.tech-card:hover {
+
+transform:translateY(-10px);
+
+box-shadow:0 12px 40px rgba(22,93,255,0.18);
+
+}
+
+.tech-card h4 {
+
+font-size:20px;
+
+color:#165DFF;
+
+margin-bottom:14px;
+
+}
+
+.tech-card p {
+
+font-size:14px;
+
+color:#64748b;
+
+line-height:1.8;
+
+margin-bottom: 6px;
+
+}

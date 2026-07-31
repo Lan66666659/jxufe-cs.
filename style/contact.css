@@ -1,0 +1,23 @@
+/* 此处写contact页面所有自定义class样式 */
+.contact-content {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 20px;
+}
+.contact-item {
+padding: 18px;
+background: rgba(255,255,255,0.72);
+backdrop-filter: blur(18px);
+border-radius: 10px;
+border:1px solid rgba(22,93,255,0.12);
+}
+.contact-item h4 {
+color: #165DFF;
+margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+.contact-content {
+grid-template-columns: 1fr;
+}
+}

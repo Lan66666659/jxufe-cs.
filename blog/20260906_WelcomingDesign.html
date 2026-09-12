@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:17 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>迎新海报系统设计</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">迎新海报系统设计</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org502b6e5">1. 综述</a></li>
+<li><a href="#orgfa5f119">2. 第一版</a>
+<ul>
+<li><a href="#org15fda45">2.1. 技术鉴赏</a></li>
+<li><a href="#orgef62f5e">2.2. 优势</a></li>
+<li><a href="#org2c96fad">2.3. 劣势</a></li>
+</ul>
+</li>
+<li><a href="#org120b088">3. 第二版</a>
+<ul>
+<li><a href="#orgdbe8d8c">3.1. 技术栈</a></li>
+<li><a href="#org53146a6">3.2. 优势</a></li>
+<li><a href="#org4ff6a50">3.3. 劣势</a></li>
+</ul>
+</li>
+<li><a href="#org458bfab">4. 第三版</a>
+<ul>
+<li><a href="#orge8dd734">4.1. 技术栈</a></li>
+<li><a href="#orgfd7bb22">4.2. 优势</a></li>
+<li><a href="#org2dbc61d">4.3. 劣势</a></li>
+</ul>
+</li>
+<li><a href="#orga6a5980">5. 总结</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org502b6e5" class="outline-2">
+<h2 id="org502b6e5"><span class="section-number-2">1.</span> 综述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+为了满足校方对于迎新的要求，我们社团需要设计一个可以让新生打开的系统。此系统应该
+实现以下功能：
+</p>
+
+<ul class="org-ul">
+<li><b>实现</b> 针对每个学生都可以生成一个专属海报。</li>
+<li><b>可以</b> 让学生下载自己的专属海报</li>
+<li><b>允许</b> 学生自行选择手机端和电脑端生成海报。</li>
+</ul>
+
+<p>
+这些功能实现起来不是很难，但是由于工期较短，因此具有一定挑战性。
+</p>
+</div>
+</div>
+<div id="outline-container-orgfa5f119" class="outline-2">
+<h2 id="orgfa5f119"><span class="section-number-2">2.</span> 第一版</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+这一版的作者是软件部部长。她使用java搭配网页技术实现了以上的基础目标，并为后面的
+改版提供了基础代码。
+</p>
+</div>
+<div id="outline-container-org15fda45" class="outline-3">
+<h3 id="org15fda45"><span class="section-number-3">2.1.</span> 技术鉴赏</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+由于作者没有详细学习过java因此这里将会简单概括。
+</p>
+
+<p>
+软件部部长实现的服务器技术栈如下：
+</p>
+<ul class="org-ul">
+<li><b>java-Servlet</b> ：一个http服务器框架，使用路由方式实现对请求的分发。</li>
+<li><b>web技术</b> ：同时包含html、css、js，这些技术基本打包在一起。</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgef62f5e" class="outline-3">
+<h3 id="orgef62f5e"><span class="section-number-3">2.2.</span> 优势</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+web相关的代码质量较好，网页几乎可以达到启动服务器即可按照预设目标工作的要求。
+</p>
+
+<p>
+java-servlet部分没有什么好说的。这是一个较为成熟的技术选择，servlet网络服务器性
+能优异，并且编程简单。这一部分的软件选型是可行的，甚至是优秀的。
+</p>
+</div>
+</div>
+<div id="outline-container-org2c96fad" class="outline-3">
+<h3 id="org2c96fad"><span class="section-number-3">2.3.</span> 劣势</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+尽管java-servlet的软件选择是一个亮点，但是存在没有考虑组员实际上不会java的现实。
+导致后续维护困难。
+</p>
+
+<p>
+web相关代码尽管有可移植性，但是不合适的地方也是有的，比如，把所有的html和css代码
+打包在一起，甚至部分有内联的js，不具备模块化的特性，不好扩展。
+</p>
+
+<p>
+另外，其为了方便运行服务，选择使用powershell脚本处理编译部署等等一系列流程，但也
+正是由于这些脚本的存在，导致下一版开发时无法直接复用项目中的pwsh代码。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org120b088" class="outline-2">
+<h2 id="org120b088"><span class="section-number-2">3.</span> 第二版</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+这一版的作者是我，维修部部长。我做的主要工作是把这些代码向quart框架迁移。并完善
+局域网连接能力。
+</p>
+</div>
+<div id="outline-container-orgdbe8d8c" class="outline-3">
+<h3 id="orgdbe8d8c"><span class="section-number-3">3.1.</span> 技术栈</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+本版本的主要改变就是把java代码更改为python代码进行部署。
+</p>
+
+<ul class="org-ul">
+<li><b>python-quart</b> 使用异步框架保证性能的同时使用python保证快速开发。</li>
+<li><b>浏览器端js</b> 使用qrcodejs来实现二维码渲染，</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org53146a6" class="outline-3">
+<h3 id="org53146a6"><span class="section-number-3">3.2.</span> 优势</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+使用python开发可以借助其强大的跨平台能力以及灵活的语法来快速迭代。
+</p>
+
+<p>
+这个版本实现了一个基于网页URL的二维码生成，以此具备了本地扫码的能力。
+</p>
+</div>
+</div>
+<div id="outline-container-org4ff6a50" class="outline-3">
+<h3 id="org4ff6a50"><span class="section-number-3">3.3.</span> 劣势</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+quart的性能相比起servlet框架实际上性能有所退步。
+</p>
+
+<p>
+这一版尽管实现了扫码功能，但是问题在于，这个功能必须要新生扫码，新生明显是没有时
+间干这事的。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org458bfab" class="outline-2">
+<h2 id="org458bfab"><span class="section-number-2">4.</span> 第三版</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+这一版的作者是量化部部长，他可以说是打通最后一公里的贡献，踢开了成功的临门一脚。
+却也埋下了隐患。
+</p>
+</div>
+<div id="outline-container-orge8dd734" class="outline-3">
+<h3 id="orge8dd734"><span class="section-number-3">4.1.</span> 技术栈</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+几乎不变，但是增加了使用cpolar部署的内网穿透服务，以及针对现场环境部署的一键运行
+脚本。
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd7bb22" class="outline-3">
+<h3 id="orgfd7bb22"><span class="section-number-3">4.2.</span> 优势</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+成功解决了新生不愿意连热点的问题，同时现场一键部署脚本的出现很好的解决了运行问题。
+</p>
+</div>
+</div>
+<div id="outline-container-org2dbc61d" class="outline-3">
+<h3 id="org2dbc61d"><span class="section-number-3">4.3.</span> 劣势</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+为了实现以上效果，其使用AI编写了一系列运行用脚本，这些脚本不随项目一同打包，因此
+无法直接使用，同时，由于脚本的分散，我们被迫维护了两个版本的代码。
+</p>
+
+<p>
+一键部署脚本不具有可移植性。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga6a5980" class="outline-2">
+<h2 id="orga6a5980"><span class="section-number-2">5.</span> 总结</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+我们成功的实现了一个简单的http服务器，并且维护其坚持过了新生报到的两天，其中犯下
+了不少代码组织或软件架构上的错误，但是依旧有可取之处。
+</p>
+
+<p>
+第一条经验，对于不需要长时间运行的所谓“一次性”软件，在编写时可以使用简单的，可
+以快速迭代的编程语言。类似代码项目由于需求方的变更速度较快，未来维护工作量小，可
+以使用尽可能简单，灵活的编程方式来完成。在这种项目要求下，软件不需要性能，安全，
+正确，只需要完成工作即可。
+</p>
+
+<p>
+第二条经验，不要把项目的运行的关键寄托在几个没有跨平台能力的脚本上，如果环境变更，
+而脚本无法临场应变便无法完成其设计的使命。比如第一版中为了让应用可以快捷运行，使
+用了powershell脚本来运行，这导致我的Linux机器无法运行。以及第三版中使用cmd编写的
+运行脚本，同理。
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-09-06 日 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:17</p>
+</div>
+</body>
+</html>

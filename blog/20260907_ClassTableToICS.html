@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-11 五 16:24 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>学校课表至ICS文件转化器</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">学校课表至ICS文件转化器</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org8e725b4">1. 前言</a></li>
+<li><a href="#orgaad6181">2. 综述</a></li>
+<li><a href="#org89712cf">3. 初步设想</a></li>
+<li><a href="#org8bc866c">4. 预实验</a></li>
+<li><a href="#orgcc67a97">5. 第一阶段：分析程序结构</a></li>
+<li><a href="#org466bda2">6. 第二阶段：网络信息获取</a>
+<ul>
+<li><a href="#org6405881">6.1. 第一步：获取参数</a></li>
+<li><a href="#org1890e98">6.2. 第二步：组合URI对象</a></li>
+<li><a href="#orgaecd408">6.3. 第三步：获取HTML数据</a></li>
+</ul>
+</li>
+<li><a href="#org21cc588">7. 第三阶段：处理HTML数据成为事件的中间表示</a>
+<ul>
+<li><a href="#orge73a011">7.1. 第一步：转化格式</a></li>
+<li><a href="#org29b3795">7.2. 第二步：选择数据</a></li>
+<li><a href="#org163e3d3">7.3. 第三步：打上标签</a></li>
+<li><a href="#orgcea0189">7.4. 第四步：转化为事件的中间表示</a></li>
+<li><a href="#org04d34ba">7.5. 第五步：筛选与整合</a></li>
+<li><a href="#org5900388">7.6. 第六步：转变为最终表示</a></li>
+</ul>
+</li>
+<li><a href="#org7420fad">8. 第四阶段：转化为ICS事件</a></li>
+<li><a href="#orge200ad7">9. 总结</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8e725b4" class="outline-2">
+<h2 id="org8e725b4"><span class="section-number-2">1.</span> 前言</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+此程序通过Guile实现，没有经验的读者可以尝试了解scheme语法。
+</p>
+</div>
+</div>
+<div id="outline-container-orgaad6181" class="outline-2">
+<h2 id="orgaad6181"><span class="section-number-2">2.</span> 综述</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+为了解决学生课表不具有日历中事件类似的“按时提醒”、“消息同步”等等功能，我打算
+实现一个可以将网页课表转化为ICS文件的程序，这样，“上课”这个动作就可以作为一个
+事件被导入到日历中，由日历进行管理，这些功能缺失问题就可以迎刃而解。
+</p>
+</div>
+</div>
+<div id="outline-container-org89712cf" class="outline-2">
+<h2 id="org89712cf"><span class="section-number-2">3.</span> 初步设想</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+对于我校课表，正常的查询路径是打开智慧江财平台，并在其中打开“我的课表”应用来查
+询。
+</p>
+
+<p>
+对“我的课表”进行分析后发现。其作为网页前端，会通过微信办事大厅来向我校后端服务
+器发送课表请求，后端会返回一个html文件，其中记录着课表的详细信息，之后前端将后端
+的内容挂载在 <code>div#kbResult</code> 来实现课表的显示。
+</p>
+
+<p>
+而且，学校还为我们编写类似程序提供了一个便捷的通路：通过微信办事大厅请求课表，只
+要求三个参数和一个cookie，分别是、请求载荷、学期、周数和一个包含 <code>JSESSIONID</code> 的
+<code>cookie</code> 。只要我们的请求具有这四个东西，就可以成功获取信息，其中，请求载荷甚至
+是固定的，只需要硬编码即可。
+</p>
+
+<p>
+注意到，后端会返回一个纯html文件，针对这个文件，可以使用css选择器或者xpath来实现
+对节点的选中并整合为事件数组。有了课程名称信息，结合学校课程时间和长度是固定的，
+可以实现对时间的标注。
+</p>
+
+<p>
+至于节假日，由于此方面信息具有不确定性，因此不决定实现对于节假日休假的特殊处理，
+这一部分将会在导入到日历后由使用者自行调整。
+</p>
+</div>
+</div>
+<div id="outline-container-org8bc866c" class="outline-2">
+<h2 id="org8bc866c"><span class="section-number-2">4.</span> 预实验</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+所谓预实验就是在正式实验之前进行的实验，可以确定正式实验的正确性，并给正式实验参
+考价值。而这里的预实验是通过AI完成的，由AI编写简易Python脚本验证。
+</p>
+
+<p>
+在经历一下午的时间之后，AI成功编写出对学校课表的处理脚本，验证其可行性。
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc67a97" class="outline-2">
+<h2 id="orgcc67a97"><span class="section-number-2">5.</span> 第一阶段：分析程序结构</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+此程序的行为是线性的，因此可以使用流水线的方式编写。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(chain (get-url datas)
+       (fetch-url _)
+       (process-html _)
+       (select-classes _)
+       (merge-same-classes _)
+       (produce-event _)
+       (write-to-file _ file))
+</code></pre>
+</div>
+
+<p>
+对于其中传递的数据可以使用“流”数据结构进行抽象。流具有惰性计算的特性，可以减少
+程序运行时内存的压力，同时“流”也提供了强大的编程支持，可以让我们像编写普通程序
+一样来编写惰性处理代码：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code><span style="color: #656565;">;;; </span><span style="color: #656565;">List Example
+</span>(<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (nums) (+ num 1)) '(1 2 3)) <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; (2 3 4)
+</span>
+<span style="color: #656565;">;;; </span><span style="color: #656565;">Stream Example
+</span>(stream-map (<span style="color: #ffa348; font-weight: bold;">lambda</span> (numbs) (+ num 1))
+            (list-&gt;stream '(1 2 3))) <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; #&lt;stream (2 3 4)&gt;</span>
+</code></pre>
+</div>
+
+<p>
+而对于处理信息的函数，其本质上就是一个对流进行处理的函数：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>FunctionInChain ::= Stream -&gt; Stream
+</code></pre>
+</div>
+
+<p>
+更激进一些，我们还可以将其视作一个把流中的单个元素映射到另一个元素的函数，只是其
+嵌套在一个 <code>stream-map</code> 中。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>FunctionInChain = stream-map &lt;Function&gt;
+</code></pre>
+</div>
+
+<p>
+由此，我们可以得到这些函数的基本结构。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (function-in-chain stream)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-elements elem)
+    (do-something elem))
+  (stream-map handle-elements stream))
+</code></pre>
+</div>
+
+<p>
+而对于流的具体实现，我使用 <a href="https://srfi.schemers.org/srfi-41/">SRFI-41</a> 实现。
+</p>
+</div>
+</div>
+<div id="outline-container-org466bda2" class="outline-2">
+<h2 id="org466bda2"><span class="section-number-2">6.</span> 第二阶段：网络信息获取</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+结合初步设想中发现的种种优势，网络信息获取的过程会相当简单。简单说，分三步，第一
+步，从终端中获取各项参数，第二步，构建载荷，第三步，发送并获取课表信息。
+</p>
+</div>
+<div id="outline-container-org6405881" class="outline-3">
+<h3 id="org6405881"><span class="section-number-3">6.1.</span> 第一步：获取参数</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+对于命令行参数解析，我打算使用 <a href="https://srfi.schemers.org/srfi-37/">SRFI-37</a> 标准中的 <code>args-fold</code> 实现。
+</p>
+
+<p>
+如果把命令看作一个函数，那么这个函数必须接受至少四个信息才能正常工作：
+</p>
+
+<ul class="org-ul">
+<li>请求学期</li>
+<li>开始时间</li>
+<li>请求周次</li>
+<li>cookie信息</li>
+</ul>
+
+<p>
+由此，设计命令行参数：
+</p>
+
+<ul class="org-ul">
+<li><code>-s</code> <code>--semester</code> ：请求学期，以 <code>YYYY,S</code> 格式编码。示例：2026,0表示2026-2027
+学年第一学期。</li>
+
+<li><code>-d</code> <code>--start-date</code> ：开始时间，以 <code>YYYY-MM-DD</code> 格式编码，通过开始时间，我们
+得以以递推的形式求得每一个事件的具体时间。另外，由于软件实现的问题，这个时间
+必须是周一，否则递推会不准确。</li>
+
+<li><p>
+<code>-w</code> <code>--weeks</code> ：请求周次，以 <code>[0-9\,\-]+</code> 格式编码，这种格式可以展开为一个周
+次列表。示例：
+</p>
+<div class="org-src-container">
+<pre class="src src-plain"><code>1 -&gt; 1
+1,2 -&gt; 1 2
+1-3 -&gt; 1 2 3
+1,3,5-7 -&gt; 1 3 5 6 7
+</code></pre>
+</div></li>
+
+<li><code>-c</code> <code>--cookie</code> ：cookie信息，一个十六进制值。为了简便起见，我不使用完整的
+cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行拼接来构建cookie。</li>
+</ul>
+
+<p>
+对于具体实现方式，请参见 <code>args-fold</code> 文档并结合读者的自行思考，这里只给出一些可
+能的要点：
+</p>
+
+<p>
+<code>option</code> 过程需要第四个选项是一个处理器，这个处理器接受三个以上参数，而对于多出
+的参数，按照标准是SEEDS，可以通过点对符号来将其打包声明为一个列表，同时，此函数
+的返回值作为下一个函数的SEEDS参数传递，此时不能直接返回一个列表，否则，再经历一
+次点对符号的打包声明，结果就会成为一个嵌套的列表，随着处理的深入，列表只会越嵌套
+越深。
+</p>
+
+<p>
+在这种情况下，请使用 <code>values</code> 过程来实现多参数传递。同时记得，一定要在
+<code>args-fold</code> 中把所有的参数给出来，如果没有，就会报出参数数量不符的错误。
+</p>
+
+<p>
+当然，根据开闭原则，更好的做法可能是使用 <code>alist</code> 传递信息，因为这个数据结构可以
+实现添加新选项时不需要改动其他处理器。
+</p>
+
+<p>
+对于以上要求可以编写参数处理器：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> option-list
+  (list (option '(#\s <span style="color: #5bc8af;">"semester"</span>) #t #t
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
+                  (values arg date weeks cookie)))
+        (option '(#\d <span style="color: #5bc8af;">"start-date"</span>) #t #t
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
+                  (values semester arg weeks cookie)))
+        (option '(#\w <span style="color: #5bc8af;">"weeks"</span>) #t #t
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
+                  (values semester date arg cookie)))
+        (option '(#\c <span style="color: #5bc8af;">"cookie"</span>) #t #t
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
+                  (values semester date weeks arg)))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (handle-oprand oprand . seeds)
+  (format #t <span style="color: #5bc8af;">"Wrong Arg: ~s~%"</span> oprand)
+  (quit 1))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (handle-unknown-opt opt name arg . seeds)
+  (format #t <span style="color: #5bc8af;">"Wrong Opt ~s with Arg ~s~%"</span> name arg)
+  (quit 1))
+
+(args-fold (cdr (command-line)) handle-unknown-opt handle-oprand
+           '() '() '() '())
+</code></pre>
+</div>
+
+<p>
+当然以上的代码只是一个示例，实际上的脚本会更加复杂。
+</p>
+
+<p>
+在得到以上参数的时候，我们即可开始下一阶段。
+</p>
+</div>
+</div>
+<div id="outline-container-org1890e98" class="outline-3">
+<h3 id="org1890e98"><span class="section-number-3">6.2.</span> 第二步：组合URI对象</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+这一阶段主要由两步组成，一个是组合URI对象，另一个就是执行http请求。
+</p>
+
+<p>
+通过周数参数，我们可以获得需要生成哪些周次的信息，这些信息全部记录在参数字符串中。
+有了这些信息，以及相对固定不变的其他各项信息，我们可以相对轻松的组织URI对象。
+</p>
+
+<p>
+在组合URI之前，首先把周次展开，周次可以看作由逗号分隔的，可能是单个周也可能是一
+个周组的列表。同时一个周组可以看作是一个记录着起始和结束信息的一对信息。在周组生
+成之后，可以拉平为一个列表
+</p>
+
+<p>
+由此我们确定周次处理的类型和机制：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>expand-week ::= String -&gt; Stream week
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (expand-week week-str)
+
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (range start stop)
+    (iota (+ 1 (- stop start)) start))
+
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week-or-week-range input)
+
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week-range)
+      (<span style="color: #ffa348; font-weight: bold;">let*</span> ((range-group
+              (<span style="color: #ffa348; font-weight: bold;">map</span> string-&gt;num (string-split #\- input)))
+             (start (list-ref range-group 0))
+             (stop (list-ref range-group 1)))
+        (range start stop)))
+
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (hadnle-week)
+      (list (string-&gt;num input)))
+
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (string-contains input <span style="color: #5bc8af;">"-"</span>)
+        (handle-week-range)
+        (handle-week)))
+
+  (chain (string-split #\, week-str)
+         (<span style="color: #ffa348; font-weight: bold;">map</span> handle-week-or-week-range _)
+         (concatnate _)
+         (list-&gt;stream _)))
+</code></pre>
+</div>
+
+<p>
+以上代码主要做的事情就是把字符串以逗号为分隔符拆分为列表，并对列表中的每一项进行
+处理，如果是一个不包含横杠的字符串，就是一个简单的单周，但是为了类型统一，需要使
+用 <code>list</code> 进行处理，如果是一个包含横杠的字符串就拆分为具有两个元素的列表，对这个
+列表进行拆分，得到的第一项与第二项分别传递给 <code>range</code> 函数。
+</p>
+
+<p>
+得到这些之后把结果组织为列表，这样就是一个列表套列表的结构，但是这种结构后续处理
+时不好处理，因此需要拉平为一个列表。具体来说就是使用 <code>concatnate</code> 函数，这个函数
+在 <a href="https://srfi.schemers.org/srfi-1">SRFI-1</a> 中有定义，我不打算细说。
+</p>
+
+<p>
+在得到这个列表之后，我们需要将列表映射为一个流来方便处理。
+</p>
+
+<p>
+对于周数流，我们可以在得到学期信息后来构建URI对象，由此定义
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>produce-uri ::= Stream week -&gt; semester -&gt; Stream uri
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (build-frag-from-alist alist)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry entry)
+    (<span style="color: #ffa348; font-weight: bold;">let</span> ((key (car entry))
+          (val (cdr entry)))
+      (string-append key <span style="color: #5bc8af;">"="</span> val)))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (merge-to-string str-list)
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (concat-two-string str1 str2)
+      (append str1 <span style="color: #5bc8af;">"&amp;"</span> str2))
+    (reduce concat-two-string str-list))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (prepend-question-mark str)
+    (append <span style="color: #5bc8af;">"?"</span> str))
+  (chain (<span style="color: #ffa348; font-weight: bold;">map</span> handle-entry alist)
+         (merge-to-string _)
+         (prepend-question-mark _)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-uri week-stream semester)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week)
+    (build-uri 'http
+               <span style="color: #7d8ac7;">#:host</span> school-host
+               <span style="color: #7d8ac7;">#:path</span> class-table-path
+               <span style="color: #7d8ac7;">#:fragments</span> (chain static-data-alist
+                                  (acons <span style="color: #5bc8af;">"weeks"</span> week _)
+                                  (acons <span style="color: #5bc8af;">"xqxn"</span> semester _)
+                                  (build-frag-from-alist _)))
+    )
+  (stream-map handle-week week-stream))
+</code></pre>
+</div>
+
+<p>
+其中使用到的库有 <code>(web uri)</code> 。
+</p>
+
+<p>
+另外，其中出现的 <code>static-data-alist</code> <code>class-table-path</code> 以及 <code>school-host</code> 是几
+个预定义的数据，具体值将不会出示，在附件中可以获取。
+</p>
+
+<p>
+以上代码处理周数数据自顶向下分两步：
+</p>
+
+<ul class="org-ul">
+<li>首先，组建URI对象，根据提前定义的值和 <code>fragments</code> 以及周数，我们得以构建URI。</li>
+
+<li>其次，构建 <code>fragments</code> 参数字符串，我们可以通过关联列表与Fragments列表的相似
+性来编写代码，在每一个条目中的键值对中间使用等号来连接，而对于条目之间，使用
+“&amp;”连接，最后在前方添加一个 “?” 即可。</li>
+</ul>
+
+<p>
+这样就可以构建出URI来了。
+</p>
+</div>
+</div>
+<div id="outline-container-orgaecd408" class="outline-3">
+<h3 id="orgaecd408"><span class="section-number-3">6.3.</span> 第三步：获取HTML数据</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+在这一步，需要快速的对文件进行下载，否则Cookie过期就会导致下载数据不完整，这里推
+荐使用多线程下载来提高速度。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>make-http-request ::= Stream uri -&gt; Stream html
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-http-request uri-strm cookie)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-uri uri)
+
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (perfrom-request)
+      (http-get
+       uri
+       <span style="color: #7d8ac7;">#:headers</span>
+       `((Cookies . ,(string-append <span style="color: #5bc8af;">"JSESSIONID="</span> cookie)))))
+    (<span style="color: #ffa348; font-weight: bold;">let-values</span> (((stat body) perfrom-request))
+      (<span style="color: #ffa348; font-weight: bold;">if</span> (equal? 200 (response-code stat))
+          body
+          (quit 2))))
+
+  (chain (stream-&gt;list uri-strm)
+         (par-map handle-uri _)
+         (list-&gt;stream _)))
+</code></pre>
+</div>
+
+<p>
+上面的代码使用到了这些库： <code>(web client)</code> <code>(ice-9 threads)</code>
+</p>
+
+<p>
+这里，我把传入的 <code>cookie</code> 变量与 <code>JSESSIONID=</code> 进行拼接，这也就可以得到符合格式
+的Cookies。只有这样服务器才可以辨认身份，同时鉴权。
+</p>
+
+<p>
+另外， <code>http-get</code> 函数的返回值是两个，第一个是http连接的状态，第二个是实际接受的
+数据，所以我们需要把这两个值解构出来并返回我们需要的实际接受数据。
+</p>
+
+<p>
+当然，需要按照返回状态来进行分支，如果不是一个成功的请求，则应该弹出，并报错，如
+果是一个成功的请求，就按照上面的流程继续做。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org21cc588" class="outline-2">
+<h2 id="org21cc588"><span class="section-number-2">7.</span> 第三阶段：处理HTML数据成为事件的中间表示</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+这一阶段主要分为四个步骤：
+</p>
+</div>
+<div id="outline-container-orge73a011" class="outline-3">
+<h3 id="orge73a011"><span class="section-number-3">7.1.</span> 第一步：转化格式</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+上一阶段成功获得了HTML的字符串，有了这些字符串，我们就可以尝试将其解析为Guile可
+以理解的格式，并加以处理。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>produce-shtml ::= Stream html -&gt; Stream shtml
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-shtml html-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-html html)
+    (html-&gt;shtml html))
+  (stream-map handle-html html-strm))
+</code></pre>
+</div>
+
+<p>
+这一阶段相对简单，其中使用到的 <code>html-&gt;shtml</code> 来自于库 <code>(htmlprag)</code> 。
+</p>
+</div>
+</div>
+<div id="outline-container-org29b3795" class="outline-3">
+<h3 id="org29b3795"><span class="section-number-3">7.2.</span> 第二步：选择数据</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+对于存在表中的数据，我们主要需要的是表中的数据，而由于学校在处理课表数据时可能出
+现的错误以及表本身的复杂性，我们需要一个DSL语言来辅助完成选择的过程。
+</p>
+
+<p>
+这里隆重介绍XML与HTML元素选择器库： <code>(sxml xpath)</code> 。
+</p>
+
+<p>
+这个库中包含着一个可以将特定列表展开为一个函数的特殊的函数： <code>sxpath</code> 。有了这个
+函数的帮助，我们得以实现编写较少的代码实现复杂的选择功能。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>((sxpath path) sxml-or-shtml-data)
+</code></pre>
+</div>
+
+<p>
+这是这个函数的基本用法，而在这个项目中，其具体代码如下：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>((sxpath '(html body html body div table tbody tr)) _)
+</code></pre>
+</div>
+
+<p>
+组合为符合格式的代码即为：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (select-data shtml-strm)
+  (<span style="color: #ffa348; font-weight: bold;">let</span> ((path '(html body html body div table tbody tr)))
+    (stream-map (sxpath path) shtml-strm)))
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org163e3d3" class="outline-3">
+<h3 id="org163e3d3"><span class="section-number-3">7.3.</span> 第三步：打上标签</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+这一步至关重要，给中间数据打上标签才可以让数据携带方便后续处理为ICS事件的信息。
+而对于事件的中间表示，可以简单一些，甚至这个时候可以选择不解析课程消息字符串，而
+留着以后解析。
+</p>
+
+<p>
+经历上一步的处理，我们成功的把数据选择出来了，但是这个情况下的数据是shtml节点集，
+无法直接使用，这一步主要是再次使用 <code>sxpath</code> 函数来选择所需数据，并将数据根据周次
+以及时间顺序打上标签。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (label-nodes node-strm week-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day node day)
+    (cons day
+          (<span style="color: #ffa348; font-weight: bold;">let</span> ((raw-data ((sxpath '(ul (*text* 2))) node)))
+            (<span style="color: #ffa348; font-weight: bold;">if</span> (null? raw-data)
+                #f
+                (string-term-both (car raw-data))))))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time node time)
+    (cons time
+          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-day
+               ((filter (sxpath '(@ valign *text*))) node)
+               (iota 7))))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-node-set node week)
+    (cons week
+          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-time node (iota 12))))
+  (stream-map handle-node-set node-strm week-strm))
+</code></pre>
+</div>
+
+<p>
+经过这个函数的处理，原始的shtml数据就被处理为一个便于解析的值了。后续的函数在编
+写时，可以较为方便的处理这些值。
+</p>
+</div>
+</div>
+<div id="outline-container-orgcea0189" class="outline-3">
+<h3 id="orgcea0189"><span class="section-number-3">7.4.</span> 第四步：转化为事件的中间表示</h3>
+<div class="outline-text-3" id="text-7-4">
+<p>
+另外，在这个阶段，我们不聚合数据，也就是说，一个具有三个连续课时的课程，在现在的
+表示方法下，是三个独立的课程。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>Entry ::= List ( class-info-str,
+                 week-of-semester,
+                 day-of-week,
+                 time-of-day,
+                 duration )
+</code></pre>
+</div>
+
+<p>
+这一步的主要挑战是，如何把原数据中，周数、时间、周几的顺序处理为上述数据结构的顺
+序。为了达成这个目标，我们可以定义辅助函数：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-entry info-str w d t)
+  (list info-str w d t 1))
+</code></pre>
+</div>
+
+<p>
+在有了这个函数之后，我们应该如何处理数据呢？
+</p>
+
+<p>
+这里的难点在于，需要处理的数据类型是一个嵌套的类型，在使用 <code>map</code> 函数进行映射的
+时候无法直接把标签的值传入处理函数中。
+</p>
+
+<p>
+我们知道，在Scheme编程语言中，常常可以听到“闭包可以捕获环境中的变量”或者类似的
+描述，当我们有了捕获环境变量的能力的时候，我们就可以通过闭包捕获的形式把函数包含
+在其中。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event label-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week-time-list-pair)
+    (<span style="color: #ffa348; font-weight: bold;">let</span> ((week (car week-time-list-pair))
+          (time-list (cdr week-time-list-pair)))
+      (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time time-day-list-pair)
+        (<span style="color: #ffa348; font-weight: bold;">let</span> ((time (car time-day-list-pair))
+              (day-list (cdr time-day-list-pair)))
+          (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day day-info-pair)
+            (<span style="color: #ffa348; font-weight: bold;">let</span> ((day (car day-info-pair))
+                  (info (cdr day-info-pair)))
+              (make-entry info week day time)))
+          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-day day-list)))
+      (<span style="color: #ffa348; font-weight: bold;">map</span> handle-time time-list)))
+  (stream-map handle-week label-strm))
+</code></pre>
+</div>
+
+<p>
+我相信有能力的读者一眼发现了一些问题，嵌套深度达到了惊人的7层，这在实践中是不提
+倡的，由此，我们需要拆分层层嵌套的函数，即便其写的长一些也可以。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event label-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day week time)
+    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (day-info-pair)
+      (<span style="color: #ffa348; font-weight: bold;">let</span> ((day (car day-info-pair))
+            (info (cdr day-info-pair)))
+        (make-entry info week day time))))
+
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time week)
+    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (time-day-list-pair)
+      (<span style="color: #ffa348; font-weight: bold;">let</span> ((time (car time-day-list-pair))
+            (day-list (cdr time-day-list-pair)))
+        (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-day week time) day-list))))
+
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week-time-list-pair)
+    (<span style="color: #ffa348; font-weight: bold;">let</span> ((week (car week-time-list-pair))
+          (time-list (cdr week-time-list-pair)))
+      (chain (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-time week) time-list)
+             (list-&gt;stream _))))
+
+  (chain label-strm
+         (stream-map handle-week _)
+         (stream-concat _)))
+</code></pre>
+</div>
+
+<p>
+像这样，通过函数应用来传递变量来拆分嵌套程序是可行的，这样做，可以让程序分层清晰。
+</p>
+</div>
+</div>
+<div id="outline-container-org04d34ba" class="outline-3">
+<h3 id="org04d34ba"><span class="section-number-3">7.5.</span> 第五步：筛选与整合</h3>
+<div class="outline-text-3" id="text-7-5">
+<p>
+这一步主要是处理数据流中表示“无课”的条目，以及可以合并为一节课的条目。
+</p>
+
+<p>
+首先是筛选，由于之前我们对字符串的存在做了从表到假值或字符串的映射因此这里的代码
+可以简单一些：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (filter-entry entry-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (not-empty entry)
+    (car entry))
+  (stream-filter not-empty entry-strm))
+</code></pre>
+</div>
+
+<p>
+其次是整合，对于课程的整合，首先看两个课程是否在可以整合的时间段，比如，第1-5节
+课是可以整合的，而对于分别处于第五节，和第六节的课，无论如何也无法聚合。再就是看
+课程信息字符串是否是一个字符串。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-mergable? entry1 entry2)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-each-list entry)
+    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (mergable-list)
+      (<span style="color: #ffa348; font-weight: bold;">if</span> (member (cadddr entry) mergable-list)
+          #t
+          #f)))
+  (<span style="color: #ffa348; font-weight: bold;">if</span> (<span style="color: #ffa348; font-weight: bold;">or</span> (null? entry1) (null? entry2))
+      #f
+      (chain (values (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-each-list entry1) mergable-time-list)
+                     (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-each-list entry2) mergable-time-list))
+             (<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">and</span> a b)) _ _)
+             (reduce (<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">or</span> a b)) #f _)
+             ((<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">and</span> a b)) _ (equal? (car entry1)
+                                                 (car entry2))))))
+</code></pre>
+</div>
+
+<p>
+以上代码中 <code>mergable-time-list</code> 是提前定义的，表示可以合并的时间的列表的列表。这
+么说可能有点拗口，以下是这个数据项的一个示例：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> mergable-time-list
+  '((0 1 2 3 4)
+    (5 6 7 8)
+    (9 10 11)))
+</code></pre>
+</div>
+
+<p>
+在一个列表中的数字代表着这两个事件是可以合并的。
+</p>
+
+<p>
+如果这两个事件是可以合并的，那么就构造新的事件：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (list-update func lst pos)
+  (<span style="color: #ffa348; font-weight: bold;">let</span> loop
+      ((prev '())
+       (curr (car lst))
+       (post (cdr lst))
+       (curr-pos 0))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (= pos curr-pos)
+        (append prev (cons (func curr) post))
+        (loop (append prev (list curr))
+              (car post)
+              (cdr post)
+              (1+ curr-pos)))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (event-merge event1 event2)
+  (list-update 1+ event1 4))
+</code></pre>
+</div>
+
+<p>
+构建新事件实际上就是把原来事件的第四项也就是课时数增加1。
+</p>
+
+<p>
+在构建新事件时，应该创建一个新流，不应该在原有流的基础上进行修改，因为目前没有可
+以实现类似功能的函数，只有 <code>stream-fold</code> 函数配合构建新流的函数才能产生我们需要
+的数据。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (merge-entry entry-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry seed next)
+    (<span style="color: #ffa348; font-weight: bold;">cond</span> ((stream-null? seed) (stream-cons next seed))
+          ((entry-mergable? (stream-car seed) next)
+           (stream-cons (entry-merge (stream-car seed next))
+                        (stream-cdr seed)))
+          (<span style="color: #ffa348; font-weight: bold;">else</span>
+           (stream-cons next seed))))
+  (stream-fold handle-entry stream-null strm))
+</code></pre>
+</div>
+
+<p>
+在合并好之后，就可以进行下一步了。
+</p>
+</div>
+</div>
+<div id="outline-container-org5900388" class="outline-3">
+<h3 id="org5900388"><span class="section-number-3">7.6.</span> 第六步：转变为最终表示</h3>
+<div class="outline-text-3" id="text-7-6">
+<p>
+这一步是重构整个事件，使其更容易处理。
+</p>
+
+<p>
+一个事件，至少需要两个部分，一个是开始时间，一个是结束时间<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>。对于这两个元素，
+都可以从上一个阶段中构建的事件的中间表示中通过计算获取。开始时间需要通过周数，天
+数，开始课时时间来计算，而结束时间需要开始时间加上时间间隔，而时间间隔比较好算，
+这里不做陈述。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-duration-from-start w d t)
+  (make-time time-duration
+             (+ (* w 604800)
+                (* 86400 d)
+                (lookup-time t))))
+</code></pre>
+</div>
+
+<p>
+其中 <code>lookup-time</code> 函数可以从全局的设置中查找 <code>t</code> 对应的相对于天的偏移量。
+</p>
+
+<p>
+有了相对于开始时间的时间间隔我们就可以将这个时间间隔加到开始时间来计算开始时间了。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-time start-date duration)
+  (add-duration (date-&gt;time-tai start-date) duration))
+</code></pre>
+</div>
+
+<p>
+而计算结束时间相对简单：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-duration-of-class class-length)
+  (make-time time-duration
+             (+ (* class-length 2700)
+                (* (- class-length 1) 900))))
+</code></pre>
+</div>
+
+<p>
+甚至有一部分代码可以复用上面的代码。
+</p>
+
+<p>
+当然，为了方便处理，字符串也需要重构为一个关联列表<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>，这里我选择使用正则表达
+式库来辅助拆分字符串。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (prase-info-str-to-alist info-str)
+  (<span style="color: #ffa348; font-weight: bold;">let*</span> ((regex <span style="color: #5bc8af;">"^(.*) (.*)\\((.*) (.*)\\)$"</span>)
+         (full-match (string-match regex info-str))
+         (class-name (match:substring full-match 1))
+         (teacher-name (match:substring full-match 2))
+         (including-week (match:substring full-match 3))
+         (location (match:substring full-match 4)))
+    (chain '()
+           (acons 'class-name class-name _)
+           (acons 'teacher-name teacher-name _)
+           (acons 'including-week including-week _)
+           (acons 'location location _)
+           (acons 'full-string info-str _))))
+</code></pre>
+</div>
+
+<p>
+有了这些函数，我们终于可以构建最终的中间表示了。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event entry-strm start-date)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry entry)
+    (<span style="color: #ffa348; font-weight: bold;">let*</span> ((info-str (list-ref entry 0))
+           (info-alist (prase-info-str-to-alist info-str))
+           (week (list-ref entry 1))
+           (day (list-ref entry 2))
+           (time (list-ref entry 3))
+           (duration (list-ref entry 4))
+           (start-offset (calc-duration-from-start week day time))
+           (end-offset (calc-duration-of-class duration))
+           (start-time (calc-time start-date start-offset))
+           (end-time (add-duration start-time end-offset)))
+      (chain info-alist
+             (acons 'start-time start-time _)
+             (acons 'end-time end-time _))))
+  (stream-map handle-entry))
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org7420fad" class="outline-2">
+<h2 id="org7420fad"><span class="section-number-2">8.</span> 第四阶段：转化为ICS事件</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+这个阶段就比较直接，把日期和时间记录转化为一个UTC时间字符串，之后按照之前的解析
+数据组合为描述字符串即可。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (date-&gt;utc-string date)
+  (date-&gt;string date <span style="color: #5bc8af;">"~Y~m~dT~H~M~SZ"</span>))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (time-tai-&gt;utc-string time)
+  (date-&gt;utc-string (time-tai-&gt;date time 0)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (date-&gt;rtime-string date)
+  (date-&gt;string date <span style="color: #5bc8af;">"~Y~m~dT~H~M~S"</span>))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (time-tai-&gt;rtime-string time)
+  (date-&gt;rtime-string (time-tai-&gt;date time)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (make-prop key val . param)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-property&gt;</span> <span style="color: #7d8ac7;">#:type</span> key
+        <span style="color: #7d8ac7;">#:value</span> val
+        <span style="color: #7d8ac7;">#:parameters</span> (<span style="color: #ffa348; font-weight: bold;">if</span> (pair? param) (car param) '())))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vevent-from-event uid dtstart dtend sum des . rest)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:name</span> <span style="color: #5bc8af;">"VEVENT"</span>
+        <span style="color: #7d8ac7;">#:properties</span>
+        (cons* (make-prop <span style="color: #5bc8af;">"UID"</span> uid)
+               (make-prop <span style="color: #5bc8af;">"DTSTAMP"</span> (date-&gt;utc-string (current-date 0)))
+               (make-prop <span style="color: #5bc8af;">"DTSTART"</span> dtstart)
+               (make-prop <span style="color: #5bc8af;">"DTEND"</span> dtend)
+               (make-prop <span style="color: #5bc8af;">"SUMMARY"</span> sum)
+               (make-prop <span style="color: #5bc8af;">"DESCRITPION"</span> des)
+               rest)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (to-ics-vevent event-strm)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-event event)
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (make-uid start-time)
+      (time-tai-&gt;rtime-string start-time))
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (make-description class-name
+                              teacher-name
+                              including
+                              location
+                              full-str)
+      (string-append
+       <span style="color: #5bc8af;">"&#35838;&#31243;&#21517;&#31216;&#65306;"</span> class-name <span style="color: #5bc8af;">"\n"</span>
+       <span style="color: #5bc8af;">"&#25945;&#24072;&#21517;&#31216;&#65306;"</span> teacher-name <span style="color: #5bc8af;">"\n"</span>
+       <span style="color: #5bc8af;">"&#21253;&#25324;&#21608;&#27425;&#65306;"</span> including-name <span style="color: #5bc8af;">"\n"</span>
+       <span style="color: #5bc8af;">"&#19978;&#35838;&#20301;&#32622;&#65306;"</span> location <span style="color: #5bc8af;">"\n"</span>
+       <span style="color: #5bc8af;">"&#21407;&#22987;&#25968;&#25454;&#65306;"</span> full-str)
+      )
+    (<span style="color: #ffa348; font-weight: bold;">let</span> ((class-name (assoc-ref event 'class-name))
+          (teacher-name (assoc-ref event 'teacher-name))
+          (including (assoc-ref event 'including-week))
+          (location (assoc-ref event 'location))
+          (full-str (assoc-ref event 'full-string))
+          (start-time (assoc-ref event 'start-time))
+          (end-time (assoc-ref event 'end-time)))
+      (make-vevent-from-event (make-uid start-time)
+                              (time-tai-&gt;rtime-string start-time)
+                              (time-tai-&gt;rtime-string end-time)
+                              class-name
+                              (make-description class-name
+                                                teacher-name
+                                                including
+                                                location
+                                                full-str))))
+  (stream-map handle-event event-strm))
+</code></pre>
+</div>
+
+<p>
+而创建好ics事件之后，就是着手把ics事件包装为一个ics日历：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vcal vevents . rest)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:type</span> <span style="color: #5bc8af;">"VCALENDER"</span>
+        <span style="color: #7d8ac7;">#:properties</span>
+        (cons* (prop <span style="color: #5bc8af;">"VERSION"</span> <span style="color: #5bc8af;">"2.0"</span>)
+               (prop <span style="color: #5bc8af;">"PRODID"</span> juxfe-prodid)
+               rest)
+        <span style="color: #7d8ac7;">#:components</span>
+        vevents))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (warp-in-calender vevent-strm)
+  (make-vcal (stream-&gt;list vevent-strm)))
+</code></pre>
+</div>
+
+<p>
+到了这一步，我们终于可以真正的把我们生成的所有的数据整个写入文件了。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (write-to-file vcal output-port)
+  (scm-&gt;ics output-port))
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge200ad7" class="outline-2">
+<h2 id="orge200ad7"><span class="section-number-2">9.</span> 总结</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+这就是整个程序了。此程序中应用了许多程序编写技巧，包括嵌套优化，流的构造等。
+</p>
+
+<p>
+希望这篇文章可以帮助读者增进编程能力。
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">&#33050;&#27880;: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+当然，如果可以，此处应该是一个时间间隔，而不是一个时刻。可是由于许多日历
+软件对于标准实现不统一，这个方法实际不可行。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+如果有读者尝试，也可以将其更改为一个记录而不是简单的关联列表。
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-09-07 一 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-11 五 16:24</p>
+</div>
+</body>
+</html>

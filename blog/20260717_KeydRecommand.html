@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>软件推荐之keyd</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">软件推荐之keyd</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org01ba8f7">1. 是什么？</a></li>
+<li><a href="#org5bfe244">2. 为什么需要键盘重映射</a></li>
+<li><a href="#org76e73b5">3. 其他的按键映射方案</a></li>
+<li><a href="#orgf7d4147">4. 我正在使用的键盘映射方案</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org01ba8f7" class="outline-2">
+<h2 id="org01ba8f7"><span class="section-number-2">1.</span> 是什么？</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+keyd 是一个用于进行按键重映射的程序，其通过直接操作内核的事件循环来进行重映射，
+可以在没有显示服务器的情况下进行重映射。
+</p>
+
+<p>
+同时基于其分层的配置体系，经过简单的学习就可以编写出复杂的键盘映射规则来。
+</p>
+</div>
+</div>
+<div id="outline-container-org5bfe244" class="outline-2">
+<h2 id="org5bfe244"><span class="section-number-2">2.</span> 为什么需要键盘重映射</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+在终端应用程序中，大多数程序宁愿多定义一些快捷键也不愿意在界面中添加按钮或者提示。
+而Ctrl作为使用的最多的修饰键承担着许多功能，比如vim中的补全就是通过按下ctrl-n/p
+来实现的，而在Emacs中更甚，几乎所有的功能都需要按下ctrl作为修饰键。而偏偏ctrl处
+于一个十分尴尬的位置，几乎要把小拇指弯曲到一个十分难受的角度才能按下按键，久而久
+之，关节炎之类的病痛就该找上来了。
+</p>
+
+<p>
+如何解决呢？答案是调换按键位置，如果你留心观察，不难发现，大写锁定键几乎可以被
+shift按键完全的取代。某种意义上，大写锁定键是十分没用的按键，但是它的位置又十分
+好，小拇指几乎不需要动就可以直接按下这个按键。如果把大写锁定和Ctrl键相互调换位置
+就可以大幅减轻小拇指的负担。
+</p>
+</div>
+</div>
+<div id="outline-container-org76e73b5" class="outline-2">
+<h2 id="org76e73b5"><span class="section-number-2">3.</span> 其他的按键映射方案</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+当然，keyd如果只有一个交换两个键的位置的功能，我也不会去推荐它。我推荐它的一个原
+因是它可以实现复杂的按键映射配置。
+</p>
+
+<p>
+比如“逃逸/控制重载按键布局”<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>这个布局就是把大写锁定键重载为短按ESC长按Ctrl
+的功能。
+</p>
+
+<p>
+keyd的官方项目中也有其他按键重映射方案，比如：
+</p>
+
+<p>
+<b>vim模式按键布局</b> ：这个按键布局主要表现是，按下大写锁定之后再按下空格切换到vim
+模拟层，让hjkl映射到左上下右的布局。
+</p>
+
+<p>
+<b>home-row模式布局</b> ：这个布局就是把“asdf-jkl;”这行被称为“home-row”的按键位置
+重新映射为长按修饰键，短按本键的模式。<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>
+</p>
+
+<p>
+<b>shift-空格延长布局</b> ：这个布局就是按下shift并长按空格时，即使放开shift，只要空
+格还在按下，就会持续模拟按下shift这个动作。在大写锁定已经被映射到其他按键的情况
+下，这个布局在连续输入大写字符时会相当好用。
+</p>
+</div>
+</div>
+<div id="outline-container-orgf7d4147" class="outline-2">
+<h2 id="orgf7d4147"><span class="section-number-2">4.</span> 我正在使用的键盘映射方案</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+首先，我对大写锁定键的执念十分强烈，我的几乎所有的定制都是在大写锁定键的基础上进
+行的。
+</p>
+
+<p>
+对于大写锁定键，比较基础的就是长按Ctrl短按Esc。在按下大写锁定键的期间，按下空格
+键会切换层，下一个层，大写锁定是super键<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>。
+</p>
+
+<p>
+同时在Ctrl层中，长按空格是按下super键，而在super层中长按空格是按下Ctrl键。
+</p>
+
+<p>
+通过这个映射，我才可以避免把手弯曲来按下Ctrl键和super键。
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">&#33050;&#27880;: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+我自己取的名字，我觉得不错。 
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+本人实际不推荐这个布局，因为短按也是有延迟的，把输入的按键延迟成200ms会造
+成可感的卡顿。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这个键实际上就是Windows键
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-07-17 五 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

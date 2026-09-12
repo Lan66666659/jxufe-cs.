@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>帖子更新</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">帖子更新</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgfc5961e">1. 更新内容</a></li>
+<li><a href="#orgc703be9">2. 脚本文件</a></li>
+<li><a href="#org7cab6e8">3. 后续的更新规划</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfc5961e" class="outline-2">
+<h2 id="orgfc5961e"><span class="section-number-2">1.</span> 更新内容</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+添加了一个脚本，使其可以在每个文件打开的时候自动运行，找到相对于其的前一篇和后一
+篇，并自动建立前后的索引，以及向上找到索引。
+</p>
+</div>
+</div>
+<div id="outline-container-orgc703be9" class="outline-2">
+<h2 id="orgc703be9"><span class="section-number-2">2.</span> 脚本文件</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+主要的更新就是一个prev-post-builder.js文件，这个文件在HTML文档的头部声明，并延
+迟加载。
+</p>
+
+<p>
+这个脚本会使用fetch函数获取index.html并解析这个文件为一个新的DOM对象。在得到这个
+对象之后，使用CSS选择器来选择所有的文章的节点，转化为数组，然后findIndex方法配合
+闭包走一遭，就能找到此文章所在的位置<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>。在编写寻找需要的闭包的时候，注意，本
+文档的path部分可以使用windows.location.pathname寻找，但是这个方法获取的路径名会
+有一个斜杠，这个时候应该调用路径名的includes方法，而不是用节点的includes方法。
+</p>
+
+<p>
+在得到位置之后，就可以根据位置寻找前一篇文章和后一篇文章了。找到之后，再找
+postamble元素，把节点连带“Prev”和“Post”的字样一同追加进页面即可。
+</p>
+
+<p>
+如果真的很好奇如何实现的，读者们可以直接访问prev-post-builder.js这个位置。
+</p>
+</div>
+</div>
+<div id="outline-container-org7cab6e8" class="outline-2">
+<h2 id="org7cab6e8"><span class="section-number-2">3.</span> 后续的更新规划</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+我希望可以在后续添加一个简单的评论区系统。这个评论区系统会使用自托管的评论管理服
+务器。
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">&#33050;&#27880;: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+初版实现曾考虑使用reduce配合状态变量来定位文章索引，后在代码审查中发现
+findIndex方法更为简洁，已据此重构。
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-07-12 日 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>上下文参数设计</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">上下文参数设计</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org908f89f">1. 什么是上下文</a>
+<ul>
+<li><a href="#orgb40ebaf">1.1. 高级语言上下文</a></li>
+<li><a href="#org3cb8eb0">1.2. 系统编程语言上下文</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org908f89f" class="outline-2">
+<h2 id="org908f89f"><span class="section-number-2">1.</span> 什么是上下文</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgb40ebaf" class="outline-3">
+<h3 id="orgb40ebaf"><span class="section-number-3">1.1.</span> 高级语言上下文</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+在高级点的，封装比较彻底的语言里面，上下文是一个键值对表，其中键是变量名，而值是
+变量名指向的值，这个设计范式被Python、scheme等等语言采用。当然，也有把变量和函数
+分开两个键值对表的设计比如Common Lisp，高级语言中的上下文可以通过创建闭包来实现。
+这也是为什么讲函数式编程的课程或者文章会说到“闭包可以捕获当前环境”。
+</p>
+
+<p>
+如果你愿意尝试，可以尝试写出如下的代码来：
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript"><code>
+function ageCons(initial)
+{
+    let age = initial;
+    return {
+        getAge: () =&gt; age,
+        setAge: (newAge) =&gt; age = newAge;
+    };
+}
+
+let ageObj = ageCons(12);
+ageObj.getAge(); // =&gt; 12
+ageObj.setAge(123);
+ageObj.getAge(); // =&gt; 123
+
+</code></pre>
+</div>
+
+<p>
+可以看到 <code>getAge</code> 和 <code>setAge</code> 作为两个闭包，捕获了构建闭包时上下文中的 <code>age</code> 变
+量。本来 <code>age</code> 变量应该被销毁，但是两个闭包持有对于这个变量的引用，这个变量得以
+不被销毁。
+</p>
+
+
+<p>
+更底层的机制是引用计数，闭包中的引用让 <code>age</code> 的引用计数器没有归零， <code>age</code> 得以持
+续存在。而两个闭包被销毁的时候， <code>age</code> 的引用计数器归零，从而销毁。
+</p>
+
+<p>
+总之，在高级语言中，上下文中的变量是可以被随意引用的，并且有专门的内存管理机制来
+保证在合适的时机释放内存。
+</p>
+</div>
+</div>
+<div id="outline-container-org3cb8eb0" class="outline-3">
+<h3 id="org3cb8eb0"><span class="section-number-3">1.2.</span> 系统编程语言上下文</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+但是在系统编程语言中，一个引用计数器几乎无法实现。以c语言为例，变量直接对应着栈
+上的内存，如果随意添加一个引用技术器，首先就是赋值操作的语义就会出现改变，其次是
+需要引入析构函数，增加复杂性，最后就是指针运算和引用计数天然矛盾。这些问题让c语
+言不可能实现内置的引用计数器。没有计数器，自然也无法实现闭包支持的高级特性。
+</p>
+
+<p>
+在这种情况下，上下文就出现了两个含义，一个是当前的键值对的绑定，另一个就是辅助编
+程的数据结构。
+</p>
+
+<p>
+键值对绑定不必多说，学习c语言的时候不可能不接触这个知识，而真正有意思的是后者。
+</p>
+
+<p>
+作为数据结构的上下文大多数是使用指针实现的，这种设计优秀的地方在于，可以通过在外
+部创建上下文并显式的传入来模拟闭包的行为。
+</p>
+
+<p>
+比如在排序的过程中，我们希望可以记录最后一次排序的比较的两个元素，而C语言正好提
+供了 <code>qsort_s()</code> 函数。这个函数要求最后一个参数传入一个指针。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><code>#include &lt;stdlib.h&gt;
+
+struct sort_record
+{
+  int prev;
+  int post;
+} record;
+
+int int_cmp_func(const void *a, const void *b, const void *c)
+{
+  struct sort_record *record = c;
+  int *prev = a;
+  int *post = b;
+  record-&gt;prev = *prev;
+  record-&gt;post = *post;
+  return *prev - *post;
+}
+
+int main()
+{
+  int arr[100];
+  int counter = 0;
+  for (int i = 0; i &lt; 10; i--)
+    {
+      for(int j = 10; j &gt; 0; j--)
+        {
+          arr[counter] = i * 10 + j;
+          counter++;
+        }
+    }
+  qsort_s(arr, sizeof(int), 100, int_cmp_func, &amp;record);
+}
+</code></pre>
+</div>
+
+<p>
+考虑以上代码， <code>qsort_s</code> 可以把一个指针传入比较函数，这个特性看上去可能不是很厉
+害，因为如果创建一个全局变量，同样可以把最后两个比较的值传出来，但是再考虑一下下
+方代码。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><code>#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+struct sort_record
+{
+  int prev;
+  int post;
+};
+
+int int_cmp_func(const void *a, const void *b, const void *c)
+{
+  struct sort_record *record = c;
+  int *prev = a;
+  int *post = b;
+  record-&gt;prev = *prev;
+  record-&gt;post = *post;
+  return *prev - *post;
+}
+
+void *sort_a_int_array(void *args)
+  {
+    void *params[2] = args;
+    int *arr = args[0];
+    struct sort_record *record = args[1];
+    qsort_s(arr, sizeof(int), 100, int_cmp_func, &amp;record);
+  }
+
+int main()
+{
+  int a_arr[100];
+  int counter = 0;
+  for (int i = 0; i &lt; 10; i++)
+    {
+      for(int j = 10; j &gt; 0; j--)
+        {
+          a_arr[counter] = i * 10 + j;
+          counter++;
+        }
+    }
+  int b_arr[100];
+  counter = 0;
+  for (int i = 0; i &lt; 10; i++)
+    {
+      for(int j = 10; j &gt; 0; j--)
+        {
+          b_arr[counter] = i * 10 + j;
+          counter++;
+        }
+    }
+
+  pthread_t a_thread;
+  struct sort_record a_record;
+  void *a_arr_args[2] = [ a_arr, &amp;a_record ];
+  if(pthread_create(&amp;a_thread, NULL, sort_a_int_array, a_arr_args))
+    {
+      return 1;
+    }
+
+  pthread_t b_thread;
+  struct sort_record b_record;
+  void *b_arr_args[2] = [ b_arr, &amp;b_record ];
+  if(pthread_create(&amp;b_thread, NULL, sort_a_int_array, b_arr_args))
+    {
+      pthread_join(a_thread, NULL);
+      return 1;
+    }
+
+  pthread_join(a_thread, NULL);
+  pthread_join(b_thread, NULL);
+}
+</code></pre>
+</div>
+
+<p>
+这里，代码使用了多线程技术来加速列表排序，在这个情况下，如果还是用全局变量，那么
+就会出现a排序的时候其变量被b破坏导致无法获取正确的数据。而使用了上下文指针的版本
+可以避免全局变量导致的变量间的互相影响。
+</p>
+
+<p>
+同时这个上下文函数还可以用来实现更灵活的遍历。一个图的实现可以提供一个遍历函数以
+BFS或者DFS的顺序进行遍历，在实现的层面上，可以使用函数指针的方式，让被传入的函数
+被应用在每一个遍历过程中的节点。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><code>void graph_bfs_trav(void (*func)(node_t *, void *), void *ctx)
+</code></pre>
+</div>
+
+<p>
+通过这个函数，配合显式上下文的设计方法，图的遍历同时记录路径就变成了可能。
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-06-23 二 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

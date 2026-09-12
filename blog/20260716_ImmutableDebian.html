@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>不可变Debian</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">不可变Debian</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org9c9f99c">1. 什么是不可变？</a></li>
+<li><a href="#org851e6d6">2. 为什么使用org</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9c9f99c" class="outline-2">
+<h2 id="org9c9f99c"><span class="section-number-2">1.</span> 什么是不可变？</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+根文件系统不可变的代称。
+</p>
+
+<p>
+传统的发行版会采用可变的根文件系统，如果用户尤其是根用户可以随意的修改几乎所有的
+文件。而把根目录设置为不可变的即只读的存储可以保证如果系统是可以运行的，那么系统
+会一直保持可运行的状态。不可能会有任何修改操作改变系统运行的条件从而让系统崩溃。
+</p>
+
+<p>
+同时不可变系统的更新也是基于其不可变的特性来实现的。每一次更新就是基于当前正在运
+行的系统重新构建一个全新的系统映像，原来的系统并没有被直接的销毁，而是被保存下来，
+随时准备着回滚。
+</p>
+
+<p>
+也正因此，不可变操作系统的更新是“原子的”。意为“一次更新就像一个不可被打破的原
+子操作一样”。更新只有成功和失败。
+</p>
+
+<p>
+基于以上的特性，不可变操作系统具有强大的恢复能力，容灾能力。比如，如果某一次更新
+出现了破坏性更新，你在不知情的情况下下载并安装了这个软件。之后许多服务跑不起来，
+这时就可以使用不可变操作系统对每次更新创建的之前的映像来回滚到上一次可以运行的系
+统版本。
+</p>
+</div>
+</div>
+<div id="outline-container-org851e6d6" class="outline-2">
+<h2 id="org851e6d6"><span class="section-number-2">2.</span> 为什么使用org</h2>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-07-16 四 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>计算机协会网站上线</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">计算机协会网站上线</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org3b78c35">1. 网站建立初衷</a></li>
+<li><a href="#org626b54f">2. 网站结构</a></li>
+<li><a href="#orgdf2bf33">3. 基本导出选项</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3b78c35" class="outline-2">
+<h2 id="org3b78c35"><span class="section-number-2">1.</span> 网站建立初衷</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+本网站为江西财经大学计算机协会（以下简称"协会"）的官方站点，用于发布技术文章、以
+及维修部相关指南。网站采用GNU官方文档风格的CSS进行设计，整体风格简洁、专业。
+</p>
+</div>
+</div>
+<div id="outline-container-org626b54f" class="outline-2">
+<h2 id="org626b54f"><span class="section-number-2">2.</span> 网站结构</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+本网站基于Emacs的Org Mode构建，所有页面均由org文件通过Emacs的导出功能生成HTML。
+此种方式使得内容的编写与维护极为便利，适合协会成员共同参与内容的创作与更新。
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf2bf33" class="outline-2">
+<h2 id="orgdf2bf33"><span class="section-number-2">3.</span> 基本导出选项</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+为了方便定位导出文件，本网站选择使用let表达式简化配置编写，并使用适用于字符串的
+合并函数来动态构建路径。
+</p>
+
+<p>
+整个项目被拆分为三部分，两个是承担了实际构建网页的项目，而最后一个项目是合并所有
+项目的伪项目。使用这种拆分模式的原因是，org文件作为源文件应该被应用到转化函数中。
+而对于CSS文件和JavaScript脚本以及类似的不应该做任何转化的文件，应该使用附件函数
+直接复制这些文件到指定的地点。
+</p>
+
+<p>
+同时，为了可以在导出的HTML文件中应用CSS和JavaScript，HTML的头部部分应该添加两行
+的外链引用。
+</p>
+
+<p>
+这些变量统一记录在此项目的根目录中的 <code>.dir-locals.el</code> 文件中，但是导出的时候不会
+一同导出，因此直接访问此路径是不可行的。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-org"><code>(let ((publish-dir "/Path/to/target/")
+         (base-dir "/Path/to/source/"))
+     `(("posts-org"
+        :base-directory ,(concat base-dir "posts")
+        :base-extension "org"
+        :recursive nil
+        :publishing-directory ,(concat publish-dir "posts")
+        :publishing-function org-html-publish-to-html
+        :language "zh-CN"
+        :auto-sitemap t
+        :sitemap-filename "index.org"
+        :sitemap-title "Association of Computer - Article"
+        :sitemap-sort-files chronologically
+        :html-head-include-default-style nil
+        :html-head-extra "
+&lt;script defer=\"defer\" src=\"prev-post-builder.js\"&gt;&lt;/script&gt;
+&lt;link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /&gt;
+"
+        )
+       ("posts-static"
+        :base-directory ,(concat base-dir "posts")
+        :base-extension "css\\|js\\|txt\\|jpg\\|gif\\|png"
+        :recursive t
+        :publishing-directory ,(concat publish-dir "posts")
+        :publishing-function org-publish-attachment
+        )
+       ("posts"
+        :components ("posts-org" "posts-static")
+        )
+       ))
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-05-30 六 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,352 @@
+/* Stylesheet for Org-mode HTML export, adapted from Texinfo manual CSS.
+   Public domain. */
+
+/**  PAGE LAYOUT  **/
+
+html, body {
+   font-family: serif;
+   font-size: 16px;
+   text-align: left;
+   text-decoration: none;
+   color: #000;
+}
+html { background-color: #e7e7e7; }
+
+body {
+   max-width: 50em;
+   margin: 0 auto 2em;
+   padding: .5em 1em 1em 1em;
+   background-color: white;
+   border: .1em solid #c0c0c0;
+}
+
+
+/** BASIC ELEMENTS **/
+
+p, pre, li, dt, dd, table, code, address { line-height: 1.5; }
+
+p {
+   text-indent: 2em;
+}
+
+p, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, blockquote {
+   padding: 0;
+}
+h1 { font-size: 2em; margin: 1em 0 }
+h2 { font-size: 1.50em; margin: 1.3em 0 0.87em 0; }
+h3 { font-size: 1.30em; margin: 1.6em 0 0.87em 0; }
+h4 { font-size: 1.13em; margin: 1.8em 0 0.88em 0; }
+h5, h6 { font-size: 1em; margin: 1em 0; }
+
+h1, h2, h3, h4, h5, h6, strong, th { font-weight: bold; }
+h1, h2, h3, h4 { color: #333; }
+h5, h6, dt { color: #222; }
+
+p, pre { margin: 1em 0; }
+pre { overflow: auto; padding: .5em 2.5%; }
+address { margin-bottom: 1em; }
+
+hr {
+   margin: 1.5em 0;
+   background: #d5bb7d; border-color: #d5bb7d;
+}
+
+blockquote { margin-left: 3%; }
+
+ul, ol { margin-left: 1.5%; }
+ul li { margin: .5em 0 .5em 1em; }
+ol li { margin: 1em 0 1em 1em; }
+ol ul li { margin: .5em 0 .5em 1em; }
+ul li p, ul ul li { margin-top: .3em; margin-bottom: .3em; }
+ul ul, ol ul { margin-top: 0; margin-bottom: 0; }
+
+ol { list-style: decimal outside; }
+ul { list-style: square outside; }
+ul ul, ol ul { list-style: circle; }
+li { list-style: inherit; }
+
+dl { margin: 1em 0; }
+dt { margin: .5em 0; }
+dd { margin: .5em 0 1em 3%; }
+dd p { margin: .5em 0; }
+
+table, td, th { width: auto; }
+table {
+   margin: 1.2em 0 1.5em;
+   border-collapse: separate;
+   border: 0; border-spacing: 0;
+   vertical-align: middle;
+}
+td, th {
+   line-height: 1.3em;
+   text-align: left;
+   background: white;
+}
+td { padding: .2em .6em; }
+th { padding: .3em .6em; }
+caption { padding: 0; margin: 0 0 .5em 0; text-align: center; }
+
+img {
+   max-width: 100%;
+   padding: 0; border: 0;
+   line-height: 2.5em; color: #666;
+}
+
+a[href] { color: #005090; }
+a[href]:visited { color: #100070; }
+a[href]:active, a[href]:hover {
+   color: #100070;
+   text-decoration: none;
+}
+h1 a[href]:visited, h2 a[href]:visited, h3 a[href]:visited,
+ h4 a[href]:visited { color: #005090; }
+h1 a[href]:hover, h2 a[href]:hover, h3 a[href]:hover,
+ h4 a[href]:hover { color: #100070; }
+
+abbr, acronym {
+   font-variant: normal;
+   border: 0 !important;
+   text-decoration: none !important;
+}
+
+del { text-decoration: line-through; }
+em, var { font-style: italic; }
+small { font-size: .9em; }
+sup { vertical-align: super; }
+sub { vertical-align: sub; }
+
+address, caption, dfn {
+   font-style: inherit;
+   font-weight: inherit;
+}
+strong, td, th { font-style: inherit; }
+em, var, cite, code { font-weight: inherit; }
+
+:not(pre) > code {
+   background: #EEE;
+   border: 2px solid #DDD;
+   border-radius: 4px;
+   font-size: 14px;
+}
+
+/** UNUSED (from reset.css) **/
+
+form, fieldset, legend, input, button, textarea {
+   padding: 0; margin: 0;
+}
+fieldset { border: 0; }
+legend { color: #000; }
+input, button, textarea, select, optgroup, option {
+   font-family: inherit;
+   font-size: inherit;
+   font-style: inherit;
+   font-weight: inherit;
+}
+input, button, textarea, select { *font-size: 100%; }
+
+ins { text-decoration: none; }
+q:before, q:after { content: ''; }
+
+
+/** SIMPLE CLASSES **/
+
+.center, .c { text-align: center; }
+.nocenter { text-align: left; }
+
+.underline { text-decoration: underline; }
+.nounderline { text-decoration: none; }
+
+.no-bullet { list-style: none; }
+.inline-list li { display: inline; }
+
+
+/** FOR WIDE SCREENS **/
+
+@media (min-width: 45em) {
+   body { padding: .5em 2em 1em 2em; }
+}
+
+
+/* =====================
+   ORG-MODE ADAPTATIONS
+   ===================== */
+
+
+/**  TABLE OF CONTENTS  **/
+
+#table-of-contents ul {
+   font-weight: bold;
+   list-style: none;
+}
+#table-of-contents ul ul {
+   font-weight: normal;
+}
+#table-of-contents {
+    border-top: 3px solid #d5bb7d;  /* 与正文分隔，与 hr 颜色一致 */
+    border-bottom: 3px solid #d5bb7d;  /* 与正文分隔，与 hr 颜色一致 */
+}
+
+/**  SOURCE CODE & EXAMPLE BLOCKS  **/
+
+pre.example, pre.src, .org-src-container pre {
+   background: #f9f6ed;
+   border-radius: .3em;
+   border: 2px solid #f0e8e5;
+   padding: 1em 2.5%;
+   overflow: auto;
+}
+
+
+/* =====================
+   SYNTAX HIGHLIGHTING
+   ===================== */
+
+/* Comments — muted, italic */
+.org-comment {
+   color: #708090;
+   font-style: italic;
+}
+.org-comment-delimiter {
+   color: #8a9aa8;
+   font-style: italic;
+}
+
+/* Keywords — strong blue (if, else, for, function, return, etc.) */
+.org-keyword {
+   color: #0066cc;
+   font-weight: bold;
+}
+
+/* Types — teal (int, void, struct, etc.) */
+.org-type {
+   color: #008080;
+}
+
+/* Strings — warm green */
+.org-string {
+   color: #2d7a3a;
+}
+
+/* Function names — dark violet */
+.org-function-name {
+   color: #5a2d8a;
+   font-weight: bold;
+}
+
+/* Constants — deep purple */
+.org-constant {
+   color: #7b2d8b;
+}
+
+/* Variables — warm brown */
+.org-variable-name {
+   color: #8b4513;
+}
+
+/* Preprocessor directives — dark red (#include, #define, etc.) */
+.org-preprocessor {
+   color: #b22222;
+   font-weight: bold;
+}
+
+
+/**  TABLES WITH CLASS "multitable"  **/
+
+.multitable {
+   margin: 1.2em auto 1.5em;
+   border: 2px solid #95b0d8;
+}
+.multitable td, .multitable th {
+   width: auto;
+}
+.multitable th {
+   border-bottom: 2px solid #95b0d8;
+}
+
+
+/**  FIGURE CAPTIONS (also uses .caption if present)  **/
+
+.caption, .float-caption {
+   display: table;
+   margin: 1em auto;
+}
+.caption p, .float-caption p {
+   margin: -.5em 0 0;
+}
+
+/* For Org's #+CAPTION: under images/tables */
+.figure p:last-child {
+   text-align: center;
+   font-style: italic;
+}
+/**  POSTAMBLE (页脚信息)  **/
+
+#postamble.status {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;   /* 右对齐 */
+    align-items: baseline;
+    gap: 1.5em;                   /* 子元素间距 */
+    margin-top: 3em;              /* 与正文拉开距离 */
+    padding-top: 0.8em;
+    border-top: 3px solid #d5bb7d;  /* 与正文分隔，与 hr 颜色一致 */
+    font-size: 0.85em;            /* 较小字体 */
+    color: #444;
+}
+
+#postamble.status p {
+    margin: 0;
+}
+
+/**  PREV / UP / POST NAVIGATION (inside #postamble)  **/
+
+#postamble-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;   /* 右对齐 */
+    align-items: baseline;
+    gap: 1.5em;                   /* 子元素间距 */
+    padding-top: 0.8em;
+    font-size: 0.85em;            /* 较小字体 */
+    color: #444;
+}
+
+#postamble-links p {
+    margin: 0;
+}
+#postamble-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 1.5em;
+}
+
+#postamble-links p {
+    margin: 0;
+}
+
+/**  FOOTNOTES: 序号与正文同行  **/
+
+#text-footnotes .footdef {
+  margin-bottom: 0.5em;   /* 脚注之间的间距 */
+}
+
+/* 让脚注文字容器和内部段落都变为行内，紧跟上标序号 */
+#text-footnotes .footdef .footpara,
+#text-footnotes .footdef .footpara p {
+  display: inline;
+  margin: 0;               /* 移除段落的默认外边距 */
+}
+
+/* 可选：微调上标序号的样式 */
+#text-footnotes .footdef sup {
+  vertical-align: super;
+  font-size: smaller;
+  margin-right: 0.2em;     /* 序号与文字间留一点空隙 */
+}
+
+/* */
+
+#content p {
+   text-align: justify;
+}

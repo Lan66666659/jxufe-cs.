@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-06 日 22:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Debian安装经验</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Debian安装经验</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgf65ef45">1. 为什么是Debian？</a></li>
+<li><a href="#org2f176bf">2. 分区与文件系统</a>
+<ul>
+<li><a href="#orge15661c">2.1. 根目录及子卷布局</a></li>
+<li><a href="#orge875296">2.2. 子卷释义</a>
+<ul>
+<li><a href="#orgfcd49b7">2.2.1. <code>@</code></a></li>
+<li><a href="#org676222d">2.2.2. <code>@home</code></a></li>
+<li><a href="#org784c4f0">2.2.3. <code>@var</code></a></li>
+<li><a href="#org2f6e2f8">2.2.4. <code>@opt</code> 和 <code>@local</code></a></li>
+<li><a href="#orga75f33f">2.2.5. <code>@root</code></a></li>
+<li><a href="#orgbaa4a27">2.2.6. <code>@srv</code></a></li>
+</ul>
+</li>
+<li><a href="#orgc3d5b9e">2.3. 交换分区及启动分区</a></li>
+</ul>
+</li>
+<li><a href="#org82cf491">3. 安装系统</a>
+<ul>
+<li><a href="#org3cc1ae9">3.1. 基本系统安装</a></li>
+<li><a href="#orgb8715ec">3.2. Bootloader</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf65ef45" class="outline-2">
+<h2 id="orgf65ef45"><span class="section-number-2">1.</span> 为什么是Debian？</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+维修部在实际工作中大量使用Debian作为主力系统，在服务器和桌面环境中均有部署。偶尔
+也会探索其他发行版，但多数是尝鲜性质。
+</p>
+
+<p>
+目前维修部使用的系统是Debian的forky分支。截止本文撰写时，forky仍为测试版，可能存
+在不稳定性，但其更新频率不低，甚至比Arch Linux还要快一些。如果forky成为稳定版，
+建议协会成员可以长期使用该版本，不必频繁更新。
+</p>
+
+<p>
+Debian的许多工具相当讨喜，比如 <code>update-alternative</code> 、 <code>update-grub</code> 等等，无论
+什么人，都应该试试Debian发行版的 <code>update*</code> 系列命令，可以相当程度上减轻发行版管
+理的复杂度，从桌面到服务器，从命令行到GUI，Debian的 <code>update*</code> 系列命令可以管理许
+多东西。
+</p>
+
+<p>
+而且Debian是一个传统发行版，用的人不少，许多应用在做适配的时候会优先为Debian进行
+适配。同时其也允许一些“Hack”玩法。相比起NixOS与GNU Guix发行版来说更符合直觉<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>。
+</p>
+</div>
+</div>
+<div id="outline-container-org2f176bf" class="outline-2">
+<h2 id="org2f176bf"><span class="section-number-2">2.</span> 分区与文件系统</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+相比各位在网上都可以找到Debian的安装教程，但是这次，我想来点不一样的。不是都说
+Arch 的安装困难吗，这回叫Debian按照Arch的安装方式进行安装，同时配置Btrfs来设置子
+卷。
+</p>
+
+<p>
+<b>注意</b> ：如果选定使用Btrfs就要保证可以一次启动成功，否则，修复根分区时需要全部挂
+载子卷，这个过程繁琐，容易出错，能一次启动就一次启动吧。
+</p>
+</div>
+<div id="outline-container-orge15661c" class="outline-3">
+<h3 id="orge15661c"><span class="section-number-3">2.1.</span> 根目录及子卷布局</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+启动到Live CD里面之后，创建文件系统，记得用Btrfs来创建，因为我们要用Btrfs的子卷
+来设置回滚系统<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>。
+</p>
+
+<p>
+创建好Btrfs分区之后可以使用mount把文件系统挂载至/mnt里面，使用Btrfs命令的子卷子
+命令来创建以下子卷：
+</p>
+
+<ul class="org-ul">
+<li><code>@</code></li>
+<li><code>@home</code></li>
+<li><code>@var</code></li>
+<li><code>@opt</code></li>
+<li><code>@root</code></li>
+<li><code>@srv</code></li>
+<li><code>@local</code></li>
+</ul>
+
+<p>
+以下的子卷可以选择性的创建<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>：
+</p>
+
+<ul class="org-ul">
+<li><code>@nix</code></li>
+<li><code>@gnu</code></li>
+</ul>
+
+<p>
+对于不希望备份的目录也可以使用子卷处理，回滚只会对存放根文件系统的子卷起效。
+</p>
+
+<p>
+同时不要设置默认子卷，让默认子卷是顶级子卷即可<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>。
+</p>
+</div>
+</div>
+<div id="outline-container-orge875296" class="outline-3">
+<h3 id="orge875296"><span class="section-number-3">2.2.</span> 子卷释义</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+以下章节会详细解释各个子卷的用途。
+</p>
+</div>
+<div id="outline-container-orgfcd49b7" class="outline-4">
+<h4 id="orgfcd49b7"><span class="section-number-4">2.2.1.</span> <code>@</code></h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+这个子卷用来存放根文件系统，和 <code>@home</code> 一样，是timeshift要求必须具有的子卷。
+</p>
+
+<p>
+这个子卷作为根文件系统存储位置，是实现回滚的核心，Btrfs的快速回滚功能是通过COW实
+现的，因此必须打开COW功能。
+</p>
+</div>
+</div>
+<div id="outline-container-org676222d" class="outline-4">
+<h4 id="org676222d"><span class="section-number-4">2.2.2.</span> <code>@home</code></h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+这个子卷用来承载用户信息，和 <code>@</code> 一样，这个子卷同样是timeshift要求的必须具有的子
+卷。
+</p>
+
+<p>
+timeshift要求必须有这个子卷的原因是，timeshift可以用来备份@home子卷。
+</p>
+</div>
+</div>
+<div id="outline-container-org784c4f0" class="outline-4">
+<h4 id="org784c4f0"><span class="section-number-4">2.2.3.</span> <code>@var</code></h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+这个子卷是用来存放变动数据的子卷，自然要脱离根目录。
+</p>
+
+<p>
+由于Btrfs的COW特性，频繁变动的数据会造成性能回退。因此要关闭COW功能。
+</p>
+
+<p>
+<b>重要</b> ：但是，不是这个文件夹中的所有东西都不进入备份，比如dpkg的包数据，如果这
+个数据没有和系统一起回滚，则引起不一致的错误。在这个情况下，请在根目录创建一个可
+以被跟踪的目录，把数据从var目录中迁移到可以被回滚的目录中。之后使用bind挂载可以
+解决，如果想要更彻底一些可以尝试把var中部分目录分离为子卷，而整体备份。
+</p>
+</div>
+</div>
+<div id="outline-container-org2f6e2f8" class="outline-4">
+<h4 id="org2f6e2f8"><span class="section-number-4">2.2.4.</span> <code>@opt</code> 和 <code>@local</code></h4>
+<div class="outline-text-4" id="text-2-2-4">
+<p>
+这两个子卷是用来放自定义的软件的地方，这两个地方都不需要频繁变动，因此可以打开
+COW。
+</p>
+
+<p>
+<code>@local</code> 挂载点为 <code>/usr/local/</code> 。
+</p>
+
+<p>
+至于为什么要独立出来？因为管理员们不想每次回滚之后都重新安装软件。
+</p>
+</div>
+</div>
+<div id="outline-container-orga75f33f" class="outline-4">
+<h4 id="orga75f33f"><span class="section-number-4">2.2.5.</span> <code>@root</code></h4>
+<div class="outline-text-4" id="text-2-2-5">
+<p>
+这个子卷是root用户家目录的子卷。
+</p>
+
+<p>
+root毕竟也是用户，也是有数据持久化的必要的。
+</p>
+</div>
+</div>
+<div id="outline-container-orgbaa4a27" class="outline-4">
+<h4 id="orgbaa4a27"><span class="section-number-4">2.2.6.</span> <code>@srv</code></h4>
+<div class="outline-text-4" id="text-2-2-6">
+<p>
+这个子卷排除备份的理由和 <code>@opt</code> 与 <code>@local</code> 的理由一致，这个文件夹中会存放服务文
+件，这些文件大多是项目，回滚是为了给这些代码提供稳定运行环境，结果把这些代码一起
+回滚了，这不行。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc3d5b9e" class="outline-3">
+<h3 id="orgc3d5b9e"><span class="section-number-3">2.3.</span> 交换分区及启动分区</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+我不打算把内存交换到文件，这个功能需要额外的设置，因此我在磁盘的最后面创建了一个
+交换分区。
+</p>
+
+<p>
+启动分区在磁盘的最前面，没什么好讲的。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org82cf491" class="outline-2">
+<h2 id="org82cf491"><span class="section-number-2">3.</span> 安装系统</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+装系统就十分关键了。
+</p>
+</div>
+<div id="outline-container-org3cc1ae9" class="outline-3">
+<h3 id="org3cc1ae9"><span class="section-number-3">3.1.</span> 基本系统安装</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+安装系统要使用特定的bootstarp工具，Arch有自己的pacstrap而我们的Debian有
+debootstrap，这个工具易用性不如pacstrap但是用好了也不错。
+</p>
+
+<p>
+同时，为了方便在切换根分区同时挂载特殊文件系统，我们会再安装一个
+<code>arch-install-scripts</code> 其中包含 <code>arch-chroot</code> 。
+</p>
+
+<p>
+以testing （即forky）版本为例，通过以下命令可以把基础系统安装在硬盘里。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>debootstrap --merged-usr testing ./ http://mirrors.example.com/debian
+</code></pre>
+</div>
+
+<p>
+<code>--merged-usr</code> 可以把 <code>/bin</code> 和 <code>/sbin</code> 连接到 <code>/usr</code> 目录中对应目录。
+</p>
+
+<p>
+在安装好这个基础系统之后，先使用 <code>genfstab -U /[mntpnt] &gt;&gt;/[newsys]/etc/fstab</code>
+建立分区表，记得修改分区表中的分区挂载选项，genfstab无法自动地发现nodatacow选项，
+应该自行添加。
+</p>
+
+<p>
+之后使用 <code>arch-chroot</code> 切换到新系统中，安装需要的软件包即可。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8715ec" class="outline-3">
+<h3 id="orgb8715ec"><span class="section-number-3">3.2.</span> Bootloader</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+千万不要忘了这一步，少了这一步，系统无法启动，然后由于Btrfs特殊的子卷设置，启动
+到启动盘，依次挂载子卷这个过程实在是过于折磨。
+</p>
+
+<p>
+基本上就是Arch Wiki里记载的流程。
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">&#33050;&#27880;: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+NixOS与Guix的配置方式较为陡峭，对于新手而言学习曲线较高，建议先熟悉传统发行版再行尝试。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+我不打算细讲这个部分，具体可以参考Arch安装教程里的创建文件系统的章节。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这两个子卷是给Nix和Guix软件包管理工具准备的，介于函数式包管理器比较特殊，
+因此可以排除在快照之外。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+这是因为timeshift通过挂载默认子卷来识别子卷与进行备份，如果默认子卷被更改
+了timeshift就无法识别子卷布局，会拒绝进行备份。
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-05-31 日 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-06 日 22:19</p>
+</div>
+</body>
+</html>

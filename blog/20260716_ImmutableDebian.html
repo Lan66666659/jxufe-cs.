@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
 <head>
-<!-- 2026-09-06 日 22:19 -->
+<!-- 2026-09-12 六 15:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>不可变Debian</title>
@@ -22,13 +22,20 @@
 <h2>&#30446;&#24405;</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9c9f99c">1. 什么是不可变？</a></li>
-<li><a href="#org851e6d6">2. 为什么使用org</a></li>
+<li><a href="#org0f175e9">1. 什么是不可变？</a></li>
+<li><a href="#orgc9d5305">2. 需要使用什么软件？</a>
+<ul>
+<li><a href="#org8115f7d">2.1. Btrfs相关设置</a></li>
+<li><a href="#org39214aa">2.2. snapper</a></li>
+<li><a href="#org7e28799">2.3. systemd-boot</a></li>
+</ul>
+</li>
+<li><a href="#orgce47527">3. 其他的问题</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org9c9f99c" class="outline-2">
-<h2 id="org9c9f99c"><span class="section-number-2">1.</span> 什么是不可变？</h2>
+<div id="outline-container-org0f175e9" class="outline-2">
+<h2 id="org0f175e9"><span class="section-number-2">1.</span> 什么是不可变？</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 根文件系统不可变的代称。
@@ -57,16 +64,122 @@
 这时就可以使用不可变操作系统对每次更新创建的之前的映像来回滚到上一次可以运行的系
 统版本。
 </p>
+
+<p>
+当然Debian作为一个老牌发行版，其无法支撑我们对它的基本结构大动手脚，但是我们至少
+可以部署一个以安装软件包为触发事件的备份系统，四舍五入是具有稳定性的，可以在出现
+破坏性更新的时候快速回滚至可运行的状态。
+</p>
 </div>
 </div>
-<div id="outline-container-org851e6d6" class="outline-2">
-<h2 id="org851e6d6"><span class="section-number-2">2.</span> 为什么使用org</h2>
+<div id="outline-container-orgc9d5305" class="outline-2">
+<h2 id="orgc9d5305"><span class="section-number-2">2.</span> 需要使用什么软件？</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+在我的实践中，只需要这么几个就可以：
+</p>
+
+<ul class="org-ul">
+<li>Btrfs</li>
+<li>snapper</li>
+<li>systemd-boot</li>
+</ul>
+
+<p>
+通过这三个软件配合，btrfs负责提供基础的子卷功能，snapper负责调用子卷功能并使用此
+功能管理快照，而systemd-boot负责的是，和以上两个功能搭配，提供快照切换的能力。
+</p>
+</div>
+<div id="outline-container-org8115f7d" class="outline-3">
+<h3 id="org8115f7d"><span class="section-number-3">2.1.</span> Btrfs相关设置</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+这一部分相对来说没有什么可讲的，只有纯粹的麻烦。
+</p>
+
+<p>
+简单来说就是创建7个子卷：
+</p>
+
+<ul class="org-ul">
+<li><code>@</code></li>
+<li><code>@home</code></li>
+<li><code>@var</code></li>
+<li><code>@opt</code></li>
+<li><code>@root</code></li>
+<li><code>@srv</code></li>
+<li><code>@local</code></li>
+</ul>
+
+<p>
+并使用，并在 <code>@</code> 子卷中创建一个 <code>@/persis</code> 目录，这个目录是用来存放希望跟随根目
+录回滚但并没有包含在根目录的特殊文件的。
+</p>
+
+<p>
+例如： <code>var</code> 目录中有一个特殊目录， <code>/var/lib/dpkg</code> ，这个目录是Debian的包管理器
+dpkg的缓存目录，如果这个目录不跟随主目录发生变化，就会出现dpkg认为一个软件已经安
+装了，但是这个软件跟随主目录回滚而消失，导致dpkg的缓存滞后从而出现问题的情况。
+</p>
+
+<p>
+针对例子中的问题，我的解决方式是，创建 <code>/persis/dpkg</code> 并使用 <code>mount -o bind</code> 来
+将两个目录连接起来，并在 <code>/etc/fstab</code> 中建立一个配置条目来实现自动挂载。这样就可
+以实现dpkg和系统状态的同步了。
+</p>
+</div>
+</div>
+<div id="outline-container-org39214aa" class="outline-3">
+<h3 id="org39214aa"><span class="section-number-3">2.2.</span> snapper</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+这个工具主要是创建并管理快照，只需要安装并创建针对根子卷的配置即可，而且由于
+Debian的钩子脚本设置，snapper还可以自动的在安装软件前后创建快照。保证相当的安全
+性。
+</p>
+</div>
+</div>
+<div id="outline-container-org7e28799" class="outline-3">
+<h3 id="org7e28799"><span class="section-number-3">2.3.</span> systemd-boot</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+主要就是针对内核启动命令行的设置，使用systemd-boot启动系统的同学需要在
+<code>/etc/kernel/cmdline</code> 文件中给出具体的参数，包括两个，一个是需要挂载哪个分区作为
+根目录，另一个就是挂载文件系统时使用的选项，务必要留空 <code>subvol</code> 和 <code>subvolid</code> 这
+两个选项。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgce47527" class="outline-2">
+<h2 id="orgce47527"><span class="section-number-2">3.</span> 其他的问题</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+至于为什么不使用GRUB启动管理器，因为Debian的GRUB软件包会将启动参数通过脚本构建出
+来，参数中挂载的子卷是精确到子卷编号的，而这和snapper的工作原理相冲突。
+</p>
+
+<p>
+snapper的快照构建方式是：对当前的根目录进行复制，复制到一个新的子卷，这个子卷就
+是当前的系统的快照，而如果需要恢复到之前的状态，需要把默认子卷设定到这个子卷。所
+谓默认子卷，就是在没有参数的时候直接挂载时默认挂载的子卷。而GRUB把子卷精确到编号
+的做法导致默认子卷的设置无法生效，自然就无法切换到快照。
+</p>
+
+<p>
+以上就是为什么不使用GRUB。
+</p>
+
+<p>
+希望这篇文章可以帮助同学们更好地管理系统。
+</p>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="date">&#26085;&#26399;: 2026-07-16 四 00:00</p>
 <p class="author">&#20316;&#32773;: 维修部部长</p>
-<p class="date">Created: 2026-09-06 日 22:19</p>
+<p class="date">Created: 2026-09-12 六 15:59</p>
 </div>
 </body>
 </html>

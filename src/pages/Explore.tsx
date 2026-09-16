@@ -22,6 +22,7 @@ import {
   Users,
 } from 'lucide-react';
 import SpotlightCard from '../components/react-bits/SpotlightCard';
+import FriendAvatar from '../components/FriendAvatar';
 import { JoinBanner, PageHeading } from '../components/shared';
 import { departmentIcons } from '../data/icons';
 import content, { departments, site } from '../data/site';
@@ -292,11 +293,7 @@ export function Friends() {
             rel="noopener noreferrer"
           >
             <div className="friend-icon">
-              {friend.image.startsWith('/img/') ? (
-                <img src={friend.image} alt="" loading="lazy" width="54" height="54" />
-              ) : (
-                <span>{friend.title.slice(0, 1)}</span>
-              )}
+              <FriendAvatar src={friend.image} name={friend.title} />
             </div>
             <ArrowUpRight className="friend-arrow" size={20} />
             <h2>{friend.title}</h2>

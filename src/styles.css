@@ -1257,6 +1257,13 @@
     height: 100%;
     object-fit: cover;
   }
+  .friend-avatar-fallback {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: #edf4ff;
+    color: #286cce;
+  }
   .friend-arrow {
     position: absolute;
     top: 30px;

@@ -371,14 +371,14 @@
     font-weight: 550;
   }
   .friend-loop-item img,
-  .friend-loop-initial {
+  .friend-loop-item .friend-avatar-fallback {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: contain;
     background: #fff;
   }
-  .friend-loop-initial {
+  .friend-loop-item .friend-avatar-fallback {
     display: inline-grid;
     place-items: center;
     color: #286cce;

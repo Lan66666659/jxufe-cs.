@@ -77,7 +77,7 @@ export function PageHeading({
       about: '1996',
       departments: '05',
       activities: '06',
-      members: '17',
+      members: String(content.members.length).padStart(2, '0'),
       resources: '04',
       blog: '08',
       friends: '10',

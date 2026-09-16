@@ -1,6 +1,37 @@
 # 本地验证记录
 
-## 内页再增加 9 种效果（当前版本）
+## 博客正文去框与控制台彩蛋（当前版本）
+
+2026-09-16：旧 Org 导出的 `outline-2`、`outline-3`、`outline-4` 章节类名与 Tailwind outline 工具类冲突，正文被意外描边。现统一改为 `org-outline-*`，并更新迁移器，避免重新导入时复发。仅变更章节类名，保留原文、目录和锚点。
+
+- `npm run check`、`npm run verify:migration` 通过。
+- 浏览器检查 8 篇博客，所有章节容器均无可见 outline；课表转 ICS 文章的目录跳转正常，代码块和目录边框保留，键盘焦点框正常显示。390px 下没有横向溢出。
+- [正文去框截图](screenshots/blog-no-section-frames.png)。
+- 页面启动时向浏览器控制台输出一次 `木鱼到此一游~`，站内切换页面不重复打印；页面正文不显示该文字。
+
+## 友链外链头像恢复
+
+2026-09-16：修复友链卡片和顶部循环带只渲染 `/img/` 本地头像、将远程头像直接替换为文字的问题。两处共用 FriendAvatar，本地与远程图片都正常加载，仅在实际加载失败后显示文字占位。
+
+- `npm run check` 通过。
+- 浏览器实际请求网络安全协会、天使にふれたよ！、江财 OFFER 的外链头像，均返回 HTTP 200；解码宽度分别为 150、600、1254，友链卡片与第一组循环项的 10 个头像均显示成功。
+- 模拟网络安全协会图片请求失败时，卡片和循环项都显示文字占位，原有链接和 10 个友链条目保留；撤销模拟后头像恢复。
+- 320、390px 手机布局无横向溢出，10 张头像均成功加载。
+- [修复后的完整友链头像截图](screenshots/friends-avatars.png)。
+
+## 优秀骨干导航与 woodfish
+
+2026-09-16：在已合并 PR #4 的基础上，桌面导航新增优秀骨干，手机菜单复用同一入口；新增 25 级成员 woodfish，并支持整张卡片打开个人博客。
+
+- `npm run check` 与 `npm run verify:migration` 均通过。迁移校验允许新增成员，仍要求原有 17 名成员全部保留且顺序不变。
+- 成员总数和页头编号均为 18；25 级筛选返回 8 人，woodfish 显示为 25 级，沿用已有友链头像。
+- 实际点击整张卡片会打开新标签页，原友链地址 `https://www.woodfish.site/newBlog/` 重定向至 `https://blog.woodfish.site/`，页面标题为 WoodFishNest | 木鱼的鱼窝。链接内部没有嵌套按钮或其他交互控件。
+- 320、390、1050、1051、1080、1200、1201、1280、1440px 下没有横向溢出，桌面导航未与加入按钮重叠；手机菜单中优秀骨干仅有一个入口。浏览器检查未捕获应用异常。
+- [手机成员卡截图](screenshots/woodfish-member-mobile.png)。
+
+以下为前一轮及更早的验证记录。
+
+## 内页再增加 9 种效果
 
 2026-09-16：全站现有 18 种 React Bits 效果。本轮新增 Aurora、CircularText、ScrollReveal、GlareHover、TiltedCard、PixelTransition、LogoLoop、RotatingText、ShinyText，分布于 8 个内页。
 

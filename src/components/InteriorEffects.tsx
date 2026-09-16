@@ -9,6 +9,7 @@ import PixelTransition from './react-bits/PixelTransition';
 import LogoLoop from './react-bits/LogoLoop';
 import RotatingText from './react-bits/RotatingText';
 import ShinyText from './react-bits/ShinyText';
+import FriendAvatar from './FriendAvatar';
 import { useSiteMotion } from '../hooks/use-site-motion';
 import content from '../data/site';
 import './react-bits/interior-effects.css';
@@ -163,11 +164,7 @@ export function MemberPixels({ member }: { member: (typeof content.members)[numb
 const friendLogos = content.friends.map((friend) => ({
   node: (
     <span className="friend-loop-item">
-      {friend.image.startsWith('/img/') ? (
-        <img src={friend.image} alt="" width="40" height="40" />
-      ) : (
-        <span className="friend-loop-initial">{friend.title[0]}</span>
-      )}
+      <FriendAvatar src={friend.image} name={friend.title} size={40} />
       <span>{friend.title}</span>
     </span>
   ),

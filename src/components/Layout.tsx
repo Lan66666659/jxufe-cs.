@@ -17,6 +17,7 @@ const navigation = [
   ['/about', '关于计协'],
   ['/departments', '部门架构'],
   ['/activities', '活动风采'],
+  ['/members', '优秀骨干'],
   ['/resources', '知识分享'],
   ['/blog', '博客天地'],
   ['/friends', '友情链接'],
@@ -103,14 +104,12 @@ export default function Layout() {
               role="navigation"
               transition={{ duration: reduced ? 0 : 0.18 }}
             >
-              {[...navigation, ['/members', '优秀骨干'], ['/contact', '联系我们']].map(
-                ([to, label]) => (
-                  <NavLink key={to} end={to === '/'} to={to} onClick={() => setMenuOpen(false)}>
-                    {label}
-                    <ArrowUpRight size={16} />
-                  </NavLink>
-                ),
-              )}
+              {[...navigation, ['/contact', '联系我们']].map(([to, label]) => (
+                <NavLink key={to} end={to === '/'} to={to} onClick={() => setMenuOpen(false)}>
+                  {label}
+                  <ArrowUpRight size={16} />
+                </NavLink>
+              ))}
             </Fade>
           )}
         </AnimatePresence>

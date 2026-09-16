@@ -6,6 +6,8 @@ import './components/react-bits/site-effects.css';
 import App from './App';
 import { SiteMotionProvider } from './components/SiteMotion';
 
+console.log('木鱼到此一游~');
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SiteMotionProvider>

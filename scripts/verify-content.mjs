@@ -18,11 +18,16 @@ const legacyGroups = compareLegacy
   : [];
 for (const [group, file, selector, title, key] of legacyGroups) {
   const $ = await read(`legacy/${file}`);
+  const originalNames = $(selector)
+    .toArray()
+    .map((item) => $(item).find(title).text().trim());
+  const currentNames = data[group].map((item) => item[key]);
   assert.deepEqual(
-    data[group].map((item) => item[key]),
-    $(selector)
-      .toArray()
-      .map((item) => $(item).find(title).text().trim()),
+    // New members may be added after migration; every original member must remain in order.
+    group === 'members'
+      ? currentNames.filter((name) => originalNames.includes(name))
+      : currentNames,
+    originalNames,
     `${group}: source entries changed or missing`,
   );
 }

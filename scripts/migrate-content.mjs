@@ -64,6 +64,14 @@ const techIndex = await read('pages/tech.html');
 const clean = (html, sourcePath) => {
   const $ = load(html, null, false);
   $('script, style, .title, .back-btn').remove();
+  // Org section classes collide with Tailwind's outline-width utilities.
+  $('[class]').each((_, el) => {
+    const classes = $(el).attr('class').split(/\s+/);
+    $(el).attr(
+      'class',
+      classes.map((name) => (/^outline-\d+$/.test(name) ? `org-${name}` : name)).join(' '),
+    );
+  });
   $('[src]').each((_, el) => {
     $(el).attr('src', image($(el).attr('src')));
   });

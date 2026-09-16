@@ -1,6 +1,18 @@
 # 本地验证记录
 
-## 内页再增加 9 种效果（当前版本）
+## 优秀骨干导航与 woodfish（当前版本）
+
+2026-09-16：在已合并 PR #4 的基础上，桌面导航新增优秀骨干，手机菜单复用同一入口；新增 25 级成员 woodfish，并支持整张卡片打开个人博客。
+
+- `npm run check` 与 `npm run verify:migration` 均通过。迁移校验允许新增成员，仍要求原有 17 名成员全部保留且顺序不变。
+- 成员总数和页头编号均为 18；25 级筛选返回 8 人，woodfish 显示为 25 级，沿用已有友链头像。
+- 实际点击整张卡片会打开新标签页，原友链地址 `https://www.woodfish.site/newBlog/` 重定向至 `https://blog.woodfish.site/`，页面标题为 WoodFishNest | 木鱼的鱼窝。链接内部没有嵌套按钮或其他交互控件。
+- 320、390、1050、1051、1080、1200、1201、1280、1440px 下没有横向溢出，桌面导航未与加入按钮重叠；手机菜单中优秀骨干仅有一个入口。浏览器检查未捕获应用异常。
+- [手机成员卡截图](screenshots/woodfish-member-mobile.png)。
+
+以下为前一轮及更早的验证记录。
+
+## 内页再增加 9 种效果
 
 2026-09-16：全站现有 18 种 React Bits 效果。本轮新增 Aurora、CircularText、ScrollReveal、GlareHover、TiltedCard、PixelTransition、LogoLoop、RotatingText、ShinyText，分布于 8 个内页。
 

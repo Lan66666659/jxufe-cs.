@@ -231,7 +231,7 @@
   }
   .desktop-nav a {
     display: block;
-    padding: 10px 17px;
+    padding: 10px 12px;
     position: relative;
     z-index: 1;
     color: #50637c;
@@ -1206,6 +1206,24 @@
     font-size: 15px;
     color: #62738a;
     margin-top: 9px;
+  }
+  .member-card-link {
+    display: block;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .member-card-link:hover,
+  .member-card-link:focus-visible {
+    border-color: #2167dc;
+    box-shadow: 0 10px 26px #2167dc18;
+  }
+  .member-info .member-blog-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #2167dc;
   }
   .friend-card {
     position: relative;

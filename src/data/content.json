@@ -168,6 +168,13 @@
       "role": "25级维修部部长",
       "description": "数据科学中外251班",
       "image": "/img/陈阔.jpg"
+    },
+    {
+      "name": "woodfish",
+      "role": "25级",
+      "description": "个人博客",
+      "image": "/img/钟俊.jpg",
+      "href": "https://www.woodfish.site/newBlog/"
     }
   ],
   "friends": [

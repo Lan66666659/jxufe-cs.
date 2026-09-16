@@ -221,16 +221,53 @@ export function Members() {
         {filtered.length} 位伙伴
       </p>
       <div className="member-grid grid grid-cols-2 gap-4 sm:grid-cols-3 lg:gap-6 min-[1021px]:grid-cols-4">
-        {filtered.map((member) => (
-          <article className="member-card" key={member.name}>
-            <MemberPixels member={member} />
-            <div className="member-info">
-              <span>{member.role}</span>
-              <h2>{member.name}</h2>
-              <p>{member.description}</p>
-            </div>
-          </article>
-        ))}
+        {filtered.map((member) => {
+          const details = (
+            <>
+              {member.href ? (
+                <div className="member-photo">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    loading="lazy"
+                    width="300"
+                    height="330"
+                  />
+                </div>
+              ) : (
+                <MemberPixels member={member} />
+              )}
+              <div className="member-info">
+                <span>{member.role}</span>
+                <h2>{member.name}</h2>
+                {member.href ? (
+                  <p className="member-blog-link">
+                    {member.description}
+                    <ArrowUpRight size={17} />
+                  </p>
+                ) : (
+                  <p>{member.description}</p>
+                )}
+              </div>
+            </>
+          );
+          return member.href ? (
+            <a
+              className="member-card member-card-link"
+              key={member.name}
+              href={member.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`访问 ${member.name} 的博客（新标签页）`}
+            >
+              {details}
+            </a>
+          ) : (
+            <article className="member-card" key={member.name}>
+              {details}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

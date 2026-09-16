@@ -28,11 +28,11 @@ npm run preview
 - React Bits：Particles、BlurText、GradientText、Magnet、ScrollVelocity、CountUp、DecryptedText、SpotlightCard、StarBorder，以及内页的 Aurora、CircularText、ScrollReveal、GlareHover、TiltedCard、PixelTransition、LogoLoop、RotatingText、ShinyText，共 18 种实际页面效果；支持手动暂停和系统减少动态效果偏好。
 - Animate UI：导航高亮、滚动进度、Fade、Tilt、Ripple Button、Tabs 和 Accordion；源文件直接维护在项目中。
 - 内页：极光横幅、旋转会徽、滚动宗旨、部门扫光、3D 活动照片、像素成员卡、伙伴循环带、工具主题轮换和流光导语。
-- 协会介绍、五部门详情、6 项活动分类、17 位骨干年级筛选、10 个友情链接。
+- 协会介绍、五部门详情、6 项活动分类、18 位骨干年级筛选、10 个友情链接。
 - 动效暂停状态在应用内页面切换时保留，系统减少动态效果设置可实时生效。
 - 4 篇知识教程、8 篇博客，支持搜索、分类、目录、脚注、代码块和文章跳转。
 - 联系方式：邮箱链接、真实 QQ 群号复制、常见问题。
-- 桌面与手机导航均包含友情链接；页面切换保留导航栏，支持键盘操作与减少动态效果偏好。
+- 桌面与手机导航均包含优秀骨干和友情链接；页面切换保留导航栏，支持键盘操作与减少动态效果偏好。
 
 ## 内容维护
 
@@ -50,6 +50,8 @@ npm run preview
 布局、间距、响应式和按钮状态使用 Tailwind 工具类或 `@apply`；特殊轨道图形、着色器容器和历史文章排版使用组件层 CSS。
 
 `npm run migrate:content` 从 `legacy/` 重新生成数据和正文，会覆盖 `src/data/content.json`、`src/data/aliases.json` 和 `src/content/` 中对应文件。正常维护请直接编辑新站文件，不必重复迁移。导入会移除可执行标签与内联事件，保留正文、代码、目录与脚注。
+
+成员资料维护在 `src/data/content.json` 的 `members` 数组中；可选 `href` 会将该成员卡片作为博客链接，未设置链接的成员保留像素翻转交互。
 
 新增文章需同时添加文章索引和 `src/content/blog-<id>.html`，并在 `aliases.json` 中登记旧地址（如适用）。
 

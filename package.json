@@ -1,0 +1,52 @@
+{
+  "name": "jxufe-computer-association",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build && node scripts/route-aliases.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "lint": "eslint .",
+    "check": "npm run lint && npm run build && npm run verify:content",
+    "migrate:content": "node scripts/migrate-content.mjs",
+    "verify:content": "node scripts/verify-content.mjs",
+    "format": "prettier --write src scripts docs README.md index.html *.json *.js *.ts",
+    "verify:migration": "node scripts/verify-content.mjs --compare-legacy"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "gsap": "^3.15.0",
+    "lucide-react": "latest",
+    "motion": "^13.3.0",
+    "ogl": "^1.0.11",
+    "radix-ui": "^1.6.7",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "latest",
+    "cheerio": "^1.1.2",
+    "eslint": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "eslint-plugin-react-refresh": "latest",
+    "globals": "latest",
+    "prettier": "^3.9.6",
+    "sanitize-html": "^2.17.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "latest",
+    "vite": "^8.3.0"
+  }
+}

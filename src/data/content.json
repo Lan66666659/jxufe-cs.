@@ -1,0 +1,323 @@
+{
+  "intro": "江财计协，全称江西财经大学计算机协会，是在江西财经大学团委、江西财经大学社团管理委员会、计算机与人工智能学院的直接关怀领导下，在校网络信息管理中心的支持下，于1996年成立的优秀学术社团。协会指导老师为陈强。协会以增强学生学习计算机兴趣、浓厚学校计算机氛围为目的，以“普及计算机知识，提高计算机应用水平，培养计算机专业人才”为宗旨，开展各种形式的学习学术活动，为全校所有计算机爱好者提供共同学习、共同提高的机会。协会分为五个部门，分别为软件部，量化部，维修部，宣传部，办公室。计算机协会下属个部门并没有明确的界限，每周的例会允许所有部门的社员们参加，大家选择自己感兴趣的知识去学习。",
+  "departments": [
+    {
+      "title": "软件部",
+      "description": "负责软件类的技术教学。负责python、HTML、C、Java的编程，负责协会网站的开发。凡是涉及到编程软件的相关知识，都由软件部来负责。"
+    },
+    {
+      "title": "维修部",
+      "description": "负责硬件类的技术教学。首要任务是协会中重装系统、拆机装机、以及电脑清灰。负责协会的技术咨询和其他同学的技术疑难解答。"
+    },
+    {
+      "title": "量化部",
+      "description": "负责信息技术教学，包括量化投资类的内容。聚宽平台智能量化投资使用教学。教会同学们数据回测，以及能够实现研报复现。"
+    },
+    {
+      "title": "宣传部",
+      "description": "宣传部虽然不像维修部和软件部有专业的技能，但也对协会的发展至关重要。宣传部负责协会举办活动时的宣传工作，首要任务是进行活动和协会形象的宣传，协会内部的一些小活动和小例会也由宣传部安排负责。"
+    },
+    {
+      "title": "办公室",
+      "description": "办公室负责活动的组织和策划，可以进行协会里人员的调配，同时负责和学院以及社团管理部对接。"
+    }
+  ],
+  "activities": [
+    {
+      "id": "1",
+      "title": "每周例会授课",
+      "description": "每周固定时间地点，制定详细授课计划，讲师由技术突出的学长学姐担任，确保教学内容的专业性与连贯性。课程内容全面覆盖浏览器插件、好用的软件推荐及其使用方法、维修知识，满足不同阶段成员的学习需求。",
+      "image": "/img/拆机维修.jpg",
+      "category": "社群日常"
+    },
+    {
+      "id": "2",
+      "title": "PC卫士进校园",
+      "description": "设立服务点，为全校师生提供免费的计算机维护服务，包括系统安装优化、软件配置、电脑清灰、病毒查杀、数据恢复、硬件诊断等，解决师生日常电脑使用中的各类疑难杂症。",
+      "image": "/img/PC.jpg",
+      "category": "志愿服务"
+    },
+    {
+      "id": "3",
+      "title": "期末学科辅导",
+      "description": "联合学习部，开设程序设计基础、高等数学、线性代数、英语等核心科目辅导专场，内容直击期末备考痛点，涵盖重点难点知识串讲、核心考点系统梳理、典型易错题精讲以及实用备考策略分享。",
+      "image": "/img/期末学科辅导.jpg",
+      "category": "共同成长"
+    },
+    {
+      "id": "4",
+      "title": "国庆期间新生编程语法培训",
+      "description": "联合程序设计竞赛协会、网络安全协会以及三大学院学习部。每天一位优秀的学长学姐开展为期一周的授课，在B站进行直播，内容为C/C++语法知识，给计算机相关专业学生奠定编程基础。",
+      "image": "/img/新生编程语法培训.png",
+      "category": "技术课堂"
+    },
+    {
+      "id": "5",
+      "title": "国庆期间新生电子扫盲课",
+      "description": "联合数智技术协会、程序设计竞赛协会、网络安全协会以及信息学院学习部。每天一位优秀的学长学姐开展为期三天的授课，在B站进行直播，内容为计算机基本操作、常用办公软件以及网络信息安全，帮助新生掌握必备的数字化技能。",
+      "image": "/img/新生电子扫盲课.png",
+      "category": "技术课堂"
+    },
+    {
+      "id": "6",
+      "title": "蓝桥杯赛前C语言答疑",
+      "description": "为学弟学妹们解答C语言学习及蓝桥杯备考的疑惑，通过学长学姐经验分享，助力其掌握比赛注意事项、时间分配及难题应对策略等，提升参赛能力与C语言学习效果。",
+      "image": "/img/C语言答疑.jpg",
+      "category": "共同成长"
+    }
+  ],
+  "members": [
+    {
+      "name": "熊佳怡",
+      "role": "25级会长",
+      "description": "25级计算机拔尖班",
+      "image": "/img/熊佳怡.jpg"
+    },
+    {
+      "name": "兰欣怡",
+      "role": "24级会长",
+      "description": "24级计算机拔尖班",
+      "image": "/img/兰欣怡.jpg"
+    },
+    {
+      "name": "易靖涵",
+      "role": "23级会长",
+      "description": "计算机232班",
+      "image": "/img/易靖涵.jpg"
+    },
+    {
+      "name": "娄子豪",
+      "role": "22级会长",
+      "description": "保研至厦门大学",
+      "image": "/img/娄子豪.jpg"
+    },
+    {
+      "name": "刘文浩",
+      "role": "23级软件部部长",
+      "description": "计算机232班",
+      "image": "/img/刘文浩.jpg"
+    },
+    {
+      "name": "叶雨涵",
+      "role": "25级支书",
+      "description": "网安251班",
+      "image": "/img/叶雨涵.jpg"
+    },
+    {
+      "name": "薛家琛",
+      "role": "24级支书",
+      "description": "软工247班",
+      "image": "/img/薛家琛.jpg"
+    },
+    {
+      "name": "雷诚",
+      "role": "24级软件部部长",
+      "description": "计算机241班",
+      "image": "/img/雷诚.jpg"
+    },
+    {
+      "name": "蔡衍",
+      "role": "24级维修部部长",
+      "description": "量化241班",
+      "image": "/img/蔡衍.jpg"
+    },
+    {
+      "name": "向锦程",
+      "role": "24级量化部部长",
+      "description": "软工247班",
+      "image": "/img/向锦程.jpg"
+    },
+    {
+      "name": "糜语霏",
+      "role": "24级宣传部部长",
+      "description": "信管242班",
+      "image": "/img/糜语霏.jpg"
+    },
+    {
+      "name": "李义乐",
+      "role": "24级办公室部长",
+      "description": "计算机241班",
+      "image": "/img/李义乐.jpg"
+    },
+    {
+      "name": "周怡桉",
+      "role": "25级办公室部长",
+      "description": "信管中外251班",
+      "image": "/img/周怡桉.jpg"
+    },
+    {
+      "name": "王欣婷",
+      "role": "25级宣传部部长",
+      "description": "软件中外251班",
+      "image": "/img/王欣婷.jpg"
+    },
+    {
+      "name": "谢嘉丽",
+      "role": "25级软件部部长",
+      "description": "软工2510班",
+      "image": "/img/谢嘉丽.jpg"
+    },
+    {
+      "name": "魏宇晟",
+      "role": "25级量化部部长",
+      "description": "信计251班",
+      "image": "/img/魏宇晟.jpg"
+    },
+    {
+      "name": "陈阔",
+      "role": "25级维修部部长",
+      "description": "数据科学中外251班",
+      "image": "/img/陈阔.jpg"
+    }
+  ],
+  "friends": [
+    {
+      "title": "江西财经大学官网",
+      "description": "学校官网",
+      "image": "/img/学校校徽.png",
+      "href": "https://www.jxufe.edu.cn/"
+    },
+    {
+      "title": "计算机与人工智能学院",
+      "description": "学院官网",
+      "image": "/img/学校校徽.png",
+      "href": "https://cai.jxufe.edu.cn/"
+    },
+    {
+      "title": "数智技术协会",
+      "description": "计算机协会数智部",
+      "image": "/img/数智技术协会.jpg",
+      "href": "https://www.jxufe-tech.top/"
+    },
+    {
+      "title": "MIUMA",
+      "description": "jt的匠心之作",
+      "image": "/img/蒋滔.jpg",
+      "href": "https://www.miuma.top/"
+    },
+    {
+      "title": "网络安全协会",
+      "description": "网安 * 领域",
+      "image": "https://csec.jxufe.edu.cn/favicon.svg",
+      "href": "https://csec.jxufe.edu.cn/"
+    },
+    {
+      "title": "天使にふれたよ！",
+      "description": "可爱就对了",
+      "image": "https://img.tantanchugasuki.cn/i/r/avatar",
+      "href": "https://tantanchugasuki.cn/"
+    },
+    {
+      "title": "woodfish",
+      "description": "我喜欢你",
+      "image": "/img/钟俊.jpg",
+      "href": "https://www.woodfish.site/newBlog/"
+    },
+    {
+      "title": "WindowsIt's Music Club",
+      "description": "cy的开源项目",
+      "image": "/img/蔡衍.jpg",
+      "href": "https://caiyan12.github.io/"
+    },
+    {
+      "title": "程序设计竞赛协会",
+      "description": "江西财经大学程序设计竞赛协会",
+      "image": "/img/程序设计竞赛协会.jpg",
+      "href": "https://jxufe-acm.cn"
+    },
+    {
+      "title": "江财OFFER",
+      "description": "打破信息差",
+      "image": "https://jufe.woodfish.site/0b9e02d4fcddecc48d4b61e79cb26f16_compressed.png",
+      "href": "https://jufe.woodfish.site"
+    }
+  ],
+  "posts": [
+    {
+      "id": "20260907_ClassTableToICS",
+      "title": "学校课表至ICS文件转化器",
+      "date": "2026-09-07",
+      "author": "维修部部长",
+      "description": "此程序通过Guile实现，没有经验的读者可以尝试了解scheme语法。",
+      "category": "开发实践"
+    },
+    {
+      "id": "20260906_WelcomingDesign",
+      "title": "迎新海报系统设计",
+      "date": "2026-09-06",
+      "author": "维修部部长",
+      "description": "为了满足校方对于迎新的要求，我们社团需要设计一个可以让新生打开的系统。此系统应该 实现以下功能：",
+      "category": "开发实践"
+    },
+    {
+      "id": "20260717_KeydRecommand",
+      "title": "软件推荐之keyd",
+      "date": "2026-07-17",
+      "author": "维修部部长",
+      "description": "keyd 是一个用于进行按键重映射的程序，其通过直接操作内核的事件循环来进行重映射， 可以在没有显示服务器的情况下进行重映射。",
+      "category": "Linux 探索"
+    },
+    {
+      "id": "20260716_ImmutableDebian",
+      "title": "不可变Debian",
+      "date": "2026-07-16",
+      "author": "维修部部长",
+      "description": "传统的发行版会采用可变的根文件系统，如果用户尤其是根用户可以随意的修改几乎所有的 文件。而把根目录设置为不可变的即只读的存储可以保证如果系统是可以运行的，那么系统 会一直保持可运行的状态。不可能会有任何修改操作改变系统运行的条件从而让系统崩溃。",
+      "category": "Linux 探索"
+    },
+    {
+      "id": "20260712_PostsUpdata",
+      "title": "帖子更新",
+      "date": "2026-07-12",
+      "author": "维修部部长",
+      "description": "添加了一个脚本，使其可以在每个文件打开的时候自动运行，找到相对于其的前一篇和后一 篇，并自动建立前后的索引，以及向上找到索引。",
+      "category": "协会动态"
+    },
+    {
+      "id": "20260623_ContextDesign",
+      "title": "上下文参数设计",
+      "date": "2026-06-23",
+      "author": "维修部部长",
+      "description": "在高级点的，封装比较彻底的语言里面，上下文是一个键值对表，其中键是变量名，而值是 变量名指向的值，这个设计范式被Python、scheme等等语言采用。当然，也有把变量和函数 分开两个键值对表的设计比如Common Lisp，高级语言中的上下文可以通过创建闭包",
+      "category": "开发实践"
+    },
+    {
+      "id": "20260531_DebianInstallationExp",
+      "title": "Debian安装经验",
+      "date": "2026-05-31",
+      "author": "维修部部长",
+      "description": "维修部在实际工作中大量使用Debian作为主力系统，在服务器和桌面环境中均有部署。偶尔 也会探索其他发行版，但多数是尝鲜性质。",
+      "category": "Linux 探索"
+    },
+    {
+      "id": "20260530_FirstOrg",
+      "title": "计算机协会网站上线",
+      "date": "2026-05-30",
+      "author": "维修部部长",
+      "description": "本网站为江西财经大学计算机协会（以下简称\"协会\"）的官方站点，用于发布技术文章、以 及维修部相关指南。网站采用GNU官方文档风格的CSS进行设计，整体风格简洁、专业。",
+      "category": "协会动态"
+    }
+  ],
+  "resources": [
+    {
+      "id": "browser",
+      "title": "浏览器插件分享",
+      "description": "篡改猴（codedorces better:题目翻译脚本、去广告脚本、VIP免费看片）、暴力猴（用来搜索页面脚本）、itab桌面"
+    },
+    {
+      "id": "software",
+      "title": "好用软件推荐",
+      "description": "学习平台: B站、CSDN、Github；笔记工具: Obsidian、Xmind；效率工具: everything、geek、firefox、bandizip解压、CPeditor、Potplayer；编辑办公: 万彩办公大师、OneNote、spacesniffer"
+    },
+    {
+      "id": "repair",
+      "title": "维修知识分享",
+      "description": "讲解拆机、装机、电脑清灰、系统优化实操教学"
+    },
+    {
+      "id": "office",
+      "title": "办公技能分享",
+      "description": "WPS全套高效技巧: 文档排版、表格函数、PPT美化、批量处理、快捷键"
+    }
+  ]
+}

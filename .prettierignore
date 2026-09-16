@@ -1,0 +1,9 @@
+legacy/
+node_modules/
+dist/
+artifacts/
+public/
+src/content/
+src/data/content.json
+src/data/aliases.json
+docs/REACT-BITS-LICENSE.md

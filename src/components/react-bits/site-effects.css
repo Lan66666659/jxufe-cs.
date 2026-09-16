@@ -1,0 +1,247 @@
+@layer components {
+  .campus-hero-bold {
+    background: radial-gradient(ellipse at 80% 42%, #dbeaff 0, transparent 48%), #f7faff;
+  }
+  .hero-particles {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(#2167dc08 1px, transparent 1px),
+      linear-gradient(90deg, #2167dc08 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .hero-orbit {
+    position: absolute;
+    width: 850px;
+    height: 850px;
+    border: 1px solid #2167dc22;
+    border-radius: 50%;
+    right: -120px;
+    top: -35px;
+    pointer-events: none;
+    z-index: -1;
+    box-shadow:
+      0 0 0 45px #2167dc04,
+      0 0 0 90px #2167dc04;
+  }
+  .hero-orbit > span {
+    position: absolute;
+    right: 47%;
+    bottom: 26px;
+    font: 12px var(--font-mono);
+    letter-spacing: 3px;
+    color: #6683ae;
+  }
+  .motion-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 26px;
+    gap: 14px;
+    color: #547399;
+    font-size: 13px;
+  }
+  .motion-toolbar > span {
+    letter-spacing: 3px;
+  }
+  .motion-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 6px 11px;
+    border: 1px solid #cfddf1;
+    border-radius: 30px;
+    background: #ffffffba;
+    color: #315685;
+  }
+  .motion-toolbar button:disabled {
+    cursor: default;
+  }
+  .campus-hero-bold .hero-grid {
+    padding-top: 42px;
+    padding-bottom: 58px;
+    gap: 40px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .campus-hero-bold h1 {
+    font-size: clamp(66px, 5.7vw, 86px);
+    letter-spacing: -3px;
+    font-weight: 850;
+    line-height: 1.25;
+  }
+  .campus-hero-bold h1 .university-name {
+    font-size: 31px;
+    font-weight: 550;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    color: #183b69;
+    display: block;
+  }
+  .association-name {
+    display: block;
+  }
+  .association-name .animated-gradient-text {
+    margin: 0;
+    display: inline-flex;
+    border-radius: 0;
+    overflow: visible;
+    font-weight: inherit;
+    cursor: inherit;
+    backdrop-filter: none;
+  }
+  .association-name .text-content {
+    animation: none;
+    padding-right: 4px;
+  }
+  .campus-hero-bold .association-motto {
+    margin-top: 32px;
+    font-size: 23px;
+  }
+  .campus-hero-bold .activity-showcase {
+    transform: rotate(2deg);
+  }
+  .campus-hero-bold .showcase-controls {
+    transform: rotate(-2deg);
+  }
+  .campus-hero-bold .showcase-photo {
+    border-width: 8px;
+    box-shadow: 0 25px 65px #1d4b9430;
+  }
+  .campus-hero-bold .hero-shortcuts {
+    border-radius: 4px 4px 16px 16px;
+    border-top: 3px solid #2167dc;
+  }
+  .community-ribbon {
+    overflow: hidden;
+    background: #2167dc;
+    color: #fff;
+    padding-block: 23px;
+    border-block: 1px solid #1a60d6;
+  }
+  .community-marquee {
+    overflow: hidden;
+  }
+  .community-scroller {
+    display: flex;
+    width: max-content;
+    white-space: nowrap;
+    font-size: clamp(26px, 3.6vw, 52px);
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: 3px;
+  }
+  .community-scroller > span {
+    display: block;
+    flex-shrink: 0;
+  }
+  .intro-facts strong {
+    font-variant-numeric: tabular-nums;
+  }
+  .join-star {
+    flex-shrink: 0;
+    border-radius: 12px;
+    padding-inline: 3px !important;
+  }
+  .join-star .inner-content {
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .join-star .button {
+    white-space: nowrap;
+  }
+  [data-motion-paused='true'] .border-gradient-top,
+  [data-motion-paused='true'] .border-gradient-bottom {
+    animation-play-state: paused;
+  }
+  @media (max-width: 1200px) {
+    .campus-hero-bold h1 {
+      font-size: 65px;
+    }
+    .campus-hero-bold h1 .university-name {
+      font-size: 27px;
+    }
+    .campus-hero-bold .hero-grid {
+      gap: 32px;
+    }
+    .campus-hero-bold .association-motto {
+      font-size: 20px;
+    }
+  }
+  @media (max-width: 1050px) {
+    .campus-hero-bold h1 {
+      font-size: 56px;
+    }
+    .campus-hero-bold h1 .university-name {
+      font-size: 24px;
+    }
+    .campus-hero-bold .hero-grid {
+      gap: 28px;
+    }
+  }
+  @media (max-width: 800px) {
+    .campus-hero-bold .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 42px;
+      padding-top: 34px;
+      padding-bottom: 32px;
+    }
+    .campus-hero-bold h1 {
+      font-size: 74px;
+    }
+    .campus-hero-bold h1 .university-name {
+      font-size: 29px;
+    }
+    .campus-hero-bold .activity-showcase {
+      transform: none;
+    }
+    .campus-hero-bold .showcase-controls {
+      transform: none;
+    }
+    .hero-orbit {
+      right: -430px;
+      top: 150px;
+    }
+  }
+  @media (max-width: 560px) {
+    .motion-toolbar {
+      padding-top: 16px;
+      font-size: 12px;
+    }
+    .motion-toolbar > span {
+      letter-spacing: 1px;
+    }
+    .campus-hero-bold h1 {
+      font-size: clamp(45px, 12.8vw, 66px);
+      letter-spacing: -2px;
+    }
+    .campus-hero-bold h1 .university-name {
+      font-size: 23px;
+      letter-spacing: 1px;
+    }
+    .campus-hero-bold .association-motto {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    .campus-hero-bold .hero-grid {
+      padding-top: 28px;
+    }
+    .campus-hero-bold .showcase-photo {
+      border-width: 5px;
+    }
+    .community-ribbon {
+      padding-block: 18px;
+    }
+    .join-star {
+      width: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .border-gradient-top,
+    .border-gradient-bottom {
+      animation: none;
+    }
+  }
+}

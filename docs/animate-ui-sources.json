@@ -1,0 +1,105 @@
+{
+  "revision": "efeb96ffd7a3b7a4868667e4ac3c346620fb3044",
+  "provenance": [
+    {
+      "name": "primitives-effects-highlight",
+      "source": "registry/primitives/effects/highlight/index.tsx",
+      "target": "components/animate-ui/primitives/effects/highlight.tsx"
+    },
+    {
+      "name": "primitives-animate-slot",
+      "source": "registry/primitives/animate/slot/index.tsx",
+      "target": "components/animate-ui/primitives/animate/slot.tsx"
+    },
+    {
+      "name": "hooks-use-auto-height",
+      "source": "registry/hooks/use-auto-height/index.tsx",
+      "target": "hooks/use-auto-height.tsx"
+    },
+    {
+      "name": "primitives-effects-auto-height",
+      "source": "registry/primitives/effects/auto-height/index.tsx",
+      "target": "components/animate-ui/primitives/effects/auto-height.tsx"
+    },
+    {
+      "name": "lib-get-strict-context",
+      "source": "registry/lib/get-strict-context/index.tsx",
+      "target": "lib/get-strict-context.tsx"
+    },
+    {
+      "name": "hooks-use-controlled-state",
+      "source": "registry/hooks/use-controlled-state/index.tsx",
+      "target": "hooks/use-controlled-state.tsx"
+    },
+    {
+      "name": "primitives-radix-tabs",
+      "source": "registry/primitives/radix/tabs/index.tsx",
+      "target": "components/animate-ui/primitives/radix/tabs.tsx"
+    },
+    {
+      "name": "components-radix-tabs",
+      "source": "registry/components/radix/tabs/index.tsx",
+      "target": "components/animate-ui/components/radix/tabs.tsx"
+    },
+    {
+      "name": "primitives-radix-accordion",
+      "source": "registry/primitives/radix/accordion/index.tsx",
+      "target": "components/animate-ui/primitives/radix/accordion.tsx"
+    },
+    {
+      "name": "components-radix-accordion",
+      "source": "registry/components/radix/accordion/index.tsx",
+      "target": "components/animate-ui/components/radix/accordion.tsx"
+    },
+    {
+      "name": "primitives-buttons-button",
+      "source": "registry/primitives/buttons/button/index.tsx",
+      "target": "components/animate-ui/primitives/buttons/button.tsx"
+    },
+    {
+      "name": "components-buttons-button",
+      "source": "registry/components/buttons/button/index.tsx",
+      "target": "components/animate-ui/components/buttons/button.tsx"
+    },
+    {
+      "name": "primitives-buttons-ripple",
+      "source": "registry/primitives/buttons/ripple/index.tsx",
+      "target": "components/animate-ui/primitives/buttons/ripple.tsx"
+    },
+    {
+      "name": "components-buttons-ripple",
+      "source": "registry/components/buttons/ripple/index.tsx",
+      "target": "components/animate-ui/components/buttons/ripple.tsx"
+    },
+    {
+      "name": "hooks-use-is-in-view",
+      "source": "registry/hooks/use-is-in-view/index.tsx",
+      "target": "hooks/use-is-in-view.tsx"
+    },
+    {
+      "name": "primitives-effects-fade",
+      "source": "registry/primitives/effects/fade/index.tsx",
+      "target": "components/animate-ui/primitives/effects/fade.tsx"
+    },
+    {
+      "name": "primitives-effects-tilt",
+      "source": "registry/primitives/effects/tilt/index.tsx",
+      "target": "components/animate-ui/primitives/effects/tilt.tsx"
+    },
+    {
+      "name": "hooks-use-motion-value-state",
+      "source": "registry/hooks/use-motion-value-state/index.tsx",
+      "target": "hooks/use-motion-value-state.tsx"
+    },
+    {
+      "name": "primitives-animate-scroll-progress",
+      "source": "registry/primitives/animate/scroll-progress/index.tsx",
+      "target": "components/animate-ui/primitives/animate/scroll-progress.tsx"
+    },
+    {
+      "name": "components-backgrounds-hexagon",
+      "source": "registry/components/backgrounds/hexagon/index.tsx",
+      "target": "components/animate-ui/components/backgrounds/hexagon.tsx"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
 <head>
-<!-- 2026-09-06 日 22:19 -->
+<!-- 2026-09-16 三 15:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>上下文参数设计</title>
@@ -22,21 +22,25 @@
 <h2>&#30446;&#24405;</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org908f89f">1. 什么是上下文</a>
+<li><a href="#orgeca8187">1. 什么是上下文</a>
 <ul>
-<li><a href="#orgb40ebaf">1.1. 高级语言上下文</a></li>
-<li><a href="#org3cb8eb0">1.2. 系统编程语言上下文</a></li>
+<li><a href="#org0405260">1.1. 高级语言上下文</a>
+<ul>
+<li><a href="#org27fb71b">1.1.1. 一些小技巧</a></li>
+</ul>
+</li>
+<li><a href="#orgc056653">1.2. 系统编程语言上下文</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org908f89f" class="outline-2">
-<h2 id="org908f89f"><span class="section-number-2">1.</span> 什么是上下文</h2>
+<div id="outline-container-orgeca8187" class="outline-2">
+<h2 id="orgeca8187"><span class="section-number-2">1.</span> 什么是上下文</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgb40ebaf" class="outline-3">
-<h3 id="orgb40ebaf"><span class="section-number-3">1.1.</span> 高级语言上下文</h3>
+<div id="outline-container-org0405260" class="outline-3">
+<h3 id="org0405260"><span class="section-number-3">1.1.</span> 高级语言上下文</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 在高级点的，封装比较彻底的语言里面，上下文是一个键值对表，其中键是变量名，而值是
@@ -50,20 +54,20 @@
 </p>
 <div class="org-src-container">
 <pre class="src src-javascript"><code>
-function ageCons(initial)
+<span style="color: #ffa348; font-weight: bold;">function</span> ageCons(initial)
 {
-    let age = initial;
-    return {
+    <span style="color: #ffa348; font-weight: bold;">let</span> age = initial;
+    <span style="color: #ffa348; font-weight: bold;">return</span> {
         getAge: () =&gt; age,
         setAge: (newAge) =&gt; age = newAge;
     };
 }
 
-let ageObj = ageCons(12);
-ageObj.getAge(); // =&gt; 12
-ageObj.setAge(123);
-ageObj.getAge(); // =&gt; 123
-
+<span style="color: #ffa348; font-weight: bold;">let</span> ageObj = ageCons(12);
+ageObj.getAge(); <span style="color: #656565;">// </span><span style="color: #656565;">=&gt; 12
+</span>ageObj.setAge(123);
+ageObj.getAge(); <span style="color: #656565;">// </span><span style="color: #656565;">=&gt; 123
+</span>
 </code></pre>
 </div>
 
@@ -73,10 +77,15 @@ ageObj.getAge(); // =&gt; 123
 不被销毁。
 </p>
 
+<p>
+同时，Node.js中使用的内存管理策略是追踪式垃圾回收，简单说就是每一个变量，参数都
+是一个个根，从根向其他部分遍历，标记，如果所有的根遍历完成，存在没有被标记的对象，
+其会被当做垃圾值被释放回收。
+</p>
 
 <p>
-更底层的机制是引用计数，闭包中的引用让 <code>age</code> 的引用计数器没有归零， <code>age</code> 得以持
-续存在。而两个闭包被销毁的时候， <code>age</code> 的引用计数器归零，从而销毁。
+当然，Node.js实际的内存管理模型会更加复杂，这里只是简单的抽象讲解，具体可以在网
+络中参考科技博客。
 </p>
 
 <p>
@@ -84,9 +93,75 @@ ageObj.getAge(); // =&gt; 123
 保证在合适的时机释放内存。
 </p>
 </div>
+<div id="outline-container-org27fb71b" class="outline-4">
+<h4 id="org27fb71b"><span class="section-number-4">1.1.1.</span> 一些小技巧</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+<pre class="src src-javascript"><code>
+<span style="color: #ffa348; font-weight: bold;">function</span> func1(a)
+{
+    <span style="color: #ffa348; font-weight: bold;">function</span> func2(b)
+    {
+        <span style="color: #ffa348; font-weight: bold;">function</span> func3(c)
+        {
+            <span style="color: #ffa348; font-weight: bold;">return</span> a + b + c;
+        }
+        <span style="color: #ffa348; font-weight: bold;">return</span> func3;
+    }
+    <span style="color: #ffa348; font-weight: bold;">return</span> func2;
+}
+
+</code></pre>
 </div>
-<div id="outline-container-org3cb8eb0" class="outline-3">
-<h3 id="org3cb8eb0"><span class="section-number-3">1.2.</span> 系统编程语言上下文</h3>
+
+<p>
+这是柯里化，把一个具有多个输入参数的函数打碎成一个一个只接受一个参数的函数，并分
+步应用，这样做的好处是，每一个函数可以带着自己的作用域被应用，可以快速构建多个函
+数。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><code><span style="color: #ffa348; font-weight: bold;">const</span> arg1 = [1,2,3];
+<span style="color: #ffa348; font-weight: bold;">const</span> arg2 = [2,3,4];
+<span style="color: #ffa348; font-weight: bold;">const</span> arg3 = [3,4,5];
+
+[func1, func1, func1]
+    .map((fn, index)=&gt;fn(arg1[index]))
+    .map((fn, index)=&gt;fn(arg2[index]))
+    .map((fn, index)=&gt;fn(arg3[index]))
+</code></pre>
+</div>
+
+<p>
+在map的“链式调用”中，其中每一个值都可以拿出来，保存，然后等待另一个参数列表构
+建完成。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><code><span style="color: #ffa348; font-weight: bold;">const</span> arg1 = [1,2,3];
+<span style="color: #ffa348; font-weight: bold;">const</span> arg2 = [2,3,4];
+
+<span style="color: #ffa348; font-weight: bold;">const</span> temp = [func1, func1, func1]
+    .map((fn, index)=&gt;fn(arg1[index]))
+    .map((fn, index)=&gt;fn(arg2[index]));
+
+<span style="color: #ffa348; font-weight: bold;">function</span> mkArgs3(){
+    <span style="color: #ffa348; font-weight: bold;">return</span> [3,4,5];
+}
+
+<span style="color: #ffa348; font-weight: bold;">const</span> arg3 = mkArgs3();
+temp.map((fn, index)=&gt;fn(arg3[index]));
+</code></pre>
+</div>
+
+<p>
+总体来说，这种方法十分灵活，可以看情况使用。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc056653" class="outline-3">
+<h3 id="orgc056653"><span class="section-number-3">1.2.</span> 系统编程语言上下文</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 但是在系统编程语言中，一个引用计数器几乎无法实现。以c语言为例，变量直接对应着栈
@@ -115,37 +190,37 @@ ageObj.getAge(); // =&gt; 123
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c"><code>#include &lt;stdlib.h&gt;
+<pre class="src src-c"><code><span style="color: #db6b1a;">#include</span> <span style="color: #5bc8af;">&lt;stdlib.h&gt;</span>
 
-struct sort_record
+<span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span>
 {
-  int prev;
-  int post;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> prev;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> post;
 } record;
 
-int int_cmp_func(const void *a, const void *b, const void *c)
+<span style="color: #5bc8af; font-weight: bold;">int</span> int_cmp_func(<span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">void</span> *a, <span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">void</span> *b, <span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">void</span> *c)
 {
-  struct sort_record *record = c;
-  int *prev = a;
-  int *post = b;
+  <span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span> *record = c;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> *prev = a;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> *post = b;
   record-&gt;prev = *prev;
   record-&gt;post = *post;
-  return *prev - *post;
+  <span style="color: #ffa348; font-weight: bold;">return</span> *prev - *post;
 }
 
-int main()
+<span style="color: #5bc8af; font-weight: bold;">int</span> main()
 {
-  int arr[100];
-  int counter = 0;
-  for (int i = 0; i &lt; 10; i--)
+  <span style="color: #5bc8af; font-weight: bold;">int</span> arr[100];
+  <span style="color: #5bc8af; font-weight: bold;">int</span> counter = 0;
+  <span style="color: #ffa348; font-weight: bold;">for</span> (<span style="color: #5bc8af; font-weight: bold;">int</span> i = 0; i &lt; 10; i--)
     {
-      for(int j = 10; j &gt; 0; j--)
+      <span style="color: #ffa348; font-weight: bold;">for</span>(<span style="color: #5bc8af; font-weight: bold;">int</span> j = 10; j &gt; 0; j--)
         {
           arr[counter] = i * 10 + j;
           counter++;
         }
     }
-  qsort_s(arr, sizeof(int), 100, int_cmp_func, &amp;record);
+  qsort_s(arr, <span style="color: #ffa348; font-weight: bold;">sizeof</span>(<span style="color: #5bc8af; font-weight: bold;">int</span>), 100, int_cmp_func, &amp;record);
 }
 </code></pre>
 </div>
@@ -157,75 +232,77 @@ int main()
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c"><code>#include &lt;stdlib.h&gt;
-#include &lt;pthread.h&gt;
+<pre class="src src-c"><code><span style="color: #db6b1a;">#include</span> <span style="color: #5bc8af;">&lt;stdlib.h&gt;</span>
+<span style="color: #db6b1a;">#include</span> <span style="color: #5bc8af;">&lt;pthread.h&gt;</span>
 
-struct sort_record
+<span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span>
 {
-  int prev;
-  int post;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> prev;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> post;
 };
 
-int int_cmp_func(const void *a, const void *b, const void *c)
+<span style="color: #5bc8af; font-weight: bold;">int</span> int_cmp_func(<span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">void</span> *a, <span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">void</span> *b, <span style="color: #5bc8af; font-weight: bold;">void</span> *c)
 {
-  struct sort_record *record = c;
-  int *prev = a;
-  int *post = b;
+  <span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span> *record = c;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> *prev = a;
+  <span style="color: #5bc8af; font-weight: bold;">int</span> *post = b;
   record-&gt;prev = *prev;
   record-&gt;post = *post;
-  return *prev - *post;
+  <span style="color: #ffa348; font-weight: bold;">return</span> *prev - *post;
 }
 
-void *sort_a_int_array(void *args)
+<span style="color: #5bc8af; font-weight: bold;">void</span> *sort_a_int_array(<span style="color: #5bc8af; font-weight: bold;">void</span> *args)
   {
-    void *params[2] = args;
-    int *arr = args[0];
-    struct sort_record *record = args[1];
-    qsort_s(arr, sizeof(int), 100, int_cmp_func, &amp;record);
+    <span style="color: #5bc8af; font-weight: bold;">void</span> **params = args;
+    <span style="color: #ffa348; font-weight: bold;">const</span> <span style="color: #5bc8af; font-weight: bold;">int</span> *arr = args[0];
+    <span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span> *record = args[1];
+    qsort_s(arr, 100, <span style="color: #ffa348; font-weight: bold;">sizeof</span>(<span style="color: #5bc8af; font-weight: bold;">int</span>), int_cmp_func, record);
+    <span style="color: #ffa348; font-weight: bold;">return</span> <span style="color: #7d8ac7;">NULL</span>;
   }
 
-int main()
+<span style="color: #5bc8af; font-weight: bold;">int</span> main()
 {
-  int a_arr[100];
-  int counter = 0;
-  for (int i = 0; i &lt; 10; i++)
+  <span style="color: #5bc8af; font-weight: bold;">int</span> a_arr[100];
+  <span style="color: #5bc8af; font-weight: bold;">int</span> counter = 0;
+  <span style="color: #ffa348; font-weight: bold;">for</span> (<span style="color: #5bc8af; font-weight: bold;">int</span> i = 0; i &lt; 10; i++)
     {
-      for(int j = 10; j &gt; 0; j--)
+      <span style="color: #ffa348; font-weight: bold;">for</span>(<span style="color: #5bc8af; font-weight: bold;">int</span> j = 10; j &gt; 0; j--)
         {
           a_arr[counter] = i * 10 + j;
           counter++;
         }
     }
-  int b_arr[100];
+  <span style="color: #5bc8af; font-weight: bold;">int</span> b_arr[100];
   counter = 0;
-  for (int i = 0; i &lt; 10; i++)
+  <span style="color: #ffa348; font-weight: bold;">for</span> (<span style="color: #5bc8af; font-weight: bold;">int</span> i = 0; i &lt; 10; i++)
     {
-      for(int j = 10; j &gt; 0; j--)
+      <span style="color: #ffa348; font-weight: bold;">for</span>(<span style="color: #5bc8af; font-weight: bold;">int</span> j = 10; j &gt; 0; j--)
         {
           b_arr[counter] = i * 10 + j;
           counter++;
         }
     }
 
-  pthread_t a_thread;
-  struct sort_record a_record;
-  void *a_arr_args[2] = [ a_arr, &amp;a_record ];
-  if(pthread_create(&amp;a_thread, NULL, sort_a_int_array, a_arr_args))
+  <span style="color: #5bc8af; font-weight: bold;">pthread_t</span> a_thread;
+  <span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span> a_record;
+  <span style="color: #5bc8af; font-weight: bold;">void</span> *a_arr_args[2] = { a_arr, &amp;a_record };
+  <span style="color: #ffa348; font-weight: bold;">if</span>(pthread_create(&amp;a_thread, <span style="color: #7d8ac7;">NULL</span>, sort_a_int_array, a_arr_args))
     {
-      return 1;
+      <span style="color: #ffa348; font-weight: bold;">return</span> 1;
     }
 
-  pthread_t b_thread;
-  struct sort_record b_record;
-  void *b_arr_args[2] = [ b_arr, &amp;b_record ];
-  if(pthread_create(&amp;b_thread, NULL, sort_a_int_array, b_arr_args))
+  <span style="color: #5bc8af; font-weight: bold;">pthread_t</span> b_thread;
+  <span style="color: #ffa348; font-weight: bold;">struct</span> <span style="color: #5bc8af; font-weight: bold;">sort_record</span> b_record;
+  <span style="color: #5bc8af; font-weight: bold;">void</span> *b_arr_args[2] = { b_arr, &amp;b_record };
+  <span style="color: #ffa348; font-weight: bold;">if</span>(pthread_create(&amp;b_thread, <span style="color: #7d8ac7;">NULL</span>, sort_a_int_array, b_arr_args))
     {
-      pthread_join(a_thread, NULL);
-      return 1;
+      pthread_join(a_thread, <span style="color: #7d8ac7;">NULL</span>);
+      <span style="color: #ffa348; font-weight: bold;">return</span> 1;
     }
 
-  pthread_join(a_thread, NULL);
-  pthread_join(b_thread, NULL);
+  pthread_join(a_thread, <span style="color: #7d8ac7;">NULL</span>);
+  pthread_join(b_thread, <span style="color: #7d8ac7;">NULL</span>);
+  <span style="color: #ffa348; font-weight: bold;">return</span> 0;
 }
 </code></pre>
 </div>
@@ -243,7 +320,7 @@ BFS或者DFS的顺序进行遍历，在实现的层面上，可以使用函数�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c"><code>void graph_bfs_trav(void (*func)(node_t *, void *), void *ctx)
+<pre class="src src-c"><code><span style="color: #5bc8af; font-weight: bold;">void</span> graph_bfs_trav(<span style="color: #5bc8af; font-weight: bold;">void</span> (*func)(<span style="color: #5bc8af; font-weight: bold;">node_t</span> *, <span style="color: #5bc8af; font-weight: bold;">void</span> *), <span style="color: #5bc8af; font-weight: bold;">void</span> *ctx)
 </code></pre>
 </div>
 
@@ -257,7 +334,7 @@ BFS或者DFS的顺序进行遍历，在实现的层面上，可以使用函数�
 <div id="postamble" class="status">
 <p class="date">&#26085;&#26399;: 2026-06-23 二 00:00</p>
 <p class="author">&#20316;&#32773;: 维修部部长</p>
-<p class="date">Created: 2026-09-06 日 22:19</p>
+<p class="date">Created: 2026-09-16 三 15:30</p>
 </div>
 </body>
 </html>

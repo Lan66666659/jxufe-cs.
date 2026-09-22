@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
 <head>
-<!-- 2026-09-06 日 22:19 -->
+<!-- 2026-09-22 二 13:41 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Debian安装经验</title>
@@ -22,34 +22,34 @@
 <h2>&#30446;&#24405;</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf65ef45">1. 为什么是Debian？</a></li>
-<li><a href="#org2f176bf">2. 分区与文件系统</a>
+<li><a href="#orgf7d4ae5">1. 为什么是Debian？</a></li>
+<li><a href="#orgdf53f17">2. 分区与文件系统</a>
 <ul>
-<li><a href="#orge15661c">2.1. 根目录及子卷布局</a></li>
-<li><a href="#orge875296">2.2. 子卷释义</a>
+<li><a href="#orgb3af3bf">2.1. 根目录及子卷布局</a></li>
+<li><a href="#orgffd8cf2">2.2. 子卷释义</a>
 <ul>
-<li><a href="#orgfcd49b7">2.2.1. <code>@</code></a></li>
-<li><a href="#org676222d">2.2.2. <code>@home</code></a></li>
-<li><a href="#org784c4f0">2.2.3. <code>@var</code></a></li>
-<li><a href="#org2f6e2f8">2.2.4. <code>@opt</code> 和 <code>@local</code></a></li>
-<li><a href="#orga75f33f">2.2.5. <code>@root</code></a></li>
-<li><a href="#orgbaa4a27">2.2.6. <code>@srv</code></a></li>
+<li><a href="#org572a097">2.2.1. <code>@</code></a></li>
+<li><a href="#orgd6b26db">2.2.2. <code>@home</code></a></li>
+<li><a href="#orge080b12">2.2.3. <code>@var</code></a></li>
+<li><a href="#orgf9c12ac">2.2.4. <code>@opt</code> 和 <code>@local</code></a></li>
+<li><a href="#orga76efbd">2.2.5. <code>@root</code></a></li>
+<li><a href="#org95a2eb0">2.2.6. <code>@srv</code></a></li>
 </ul>
 </li>
-<li><a href="#orgc3d5b9e">2.3. 交换分区及启动分区</a></li>
+<li><a href="#org0e18dd2">2.3. 交换分区及启动分区</a></li>
 </ul>
 </li>
-<li><a href="#org82cf491">3. 安装系统</a>
+<li><a href="#org4b21b81">3. 安装系统</a>
 <ul>
-<li><a href="#org3cc1ae9">3.1. 基本系统安装</a></li>
-<li><a href="#orgb8715ec">3.2. Bootloader</a></li>
+<li><a href="#orgdee5c80">3.1. 基本系统安装</a></li>
+<li><a href="#org60ffdd7">3.2. Bootloader</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf65ef45" class="outline-2">
-<h2 id="orgf65ef45"><span class="section-number-2">1.</span> 为什么是Debian？</h2>
+<div id="outline-container-orgf7d4ae5" class="outline-2">
+<h2 id="orgf7d4ae5"><span class="section-number-2">1.</span> 为什么是Debian？</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 维修部在实际工作中大量使用Debian作为主力系统，在服务器和桌面环境中均有部署。偶尔
@@ -63,7 +63,7 @@
 </p>
 
 <p>
-Debian的许多工具相当讨喜，比如 <code>update-alternative</code> 、 <code>update-grub</code> 等等，无论
+Debian的许多工具相当讨喜，比如 <code>update-alternatives</code> 、 <code>update-grub</code> 等等，无论
 什么人，都应该试试Debian发行版的 <code>update*</code> 系列命令，可以相当程度上减轻发行版管
 理的复杂度，从桌面到服务器，从命令行到GUI，Debian的 <code>update*</code> 系列命令可以管理许
 多东西。
@@ -75,8 +75,8 @@ Debian的许多工具相当讨喜，比如 <code>update-alternative</code> 、 <
 </p>
 </div>
 </div>
-<div id="outline-container-org2f176bf" class="outline-2">
-<h2 id="org2f176bf"><span class="section-number-2">2.</span> 分区与文件系统</h2>
+<div id="outline-container-orgdf53f17" class="outline-2">
+<h2 id="orgdf53f17"><span class="section-number-2">2.</span> 分区与文件系统</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 相比各位在网上都可以找到Debian的安装教程，但是这次，我想来点不一样的。不是都说
@@ -89,8 +89,8 @@ Arch 的安装困难吗，这回叫Debian按照Arch的安装方式进行安装�
 载子卷，这个过程繁琐，容易出错，能一次启动就一次启动吧。
 </p>
 </div>
-<div id="outline-container-orge15661c" class="outline-3">
-<h3 id="orge15661c"><span class="section-number-3">2.1.</span> 根目录及子卷布局</h3>
+<div id="outline-container-orgb3af3bf" class="outline-3">
+<h3 id="orgb3af3bf"><span class="section-number-3">2.1.</span> 根目录及子卷布局</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 启动到Live CD里面之后，创建文件系统，记得用Btrfs来创建，因为我们要用Btrfs的子卷
@@ -130,15 +130,15 @@ Arch 的安装困难吗，这回叫Debian按照Arch的安装方式进行安装�
 </p>
 </div>
 </div>
-<div id="outline-container-orge875296" class="outline-3">
-<h3 id="orge875296"><span class="section-number-3">2.2.</span> 子卷释义</h3>
+<div id="outline-container-orgffd8cf2" class="outline-3">
+<h3 id="orgffd8cf2"><span class="section-number-3">2.2.</span> 子卷释义</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 以下章节会详细解释各个子卷的用途。
 </p>
 </div>
-<div id="outline-container-orgfcd49b7" class="outline-4">
-<h4 id="orgfcd49b7"><span class="section-number-4">2.2.1.</span> <code>@</code></h4>
+<div id="outline-container-org572a097" class="outline-4">
+<h4 id="org572a097"><span class="section-number-4">2.2.1.</span> <code>@</code></h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 这个子卷用来存放根文件系统，和 <code>@home</code> 一样，是timeshift要求必须具有的子卷。
@@ -150,8 +150,8 @@ Arch 的安装困难吗，这回叫Debian按照Arch的安装方式进行安装�
 </p>
 </div>
 </div>
-<div id="outline-container-org676222d" class="outline-4">
-<h4 id="org676222d"><span class="section-number-4">2.2.2.</span> <code>@home</code></h4>
+<div id="outline-container-orgd6b26db" class="outline-4">
+<h4 id="orgd6b26db"><span class="section-number-4">2.2.2.</span> <code>@home</code></h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 这个子卷用来承载用户信息，和 <code>@</code> 一样，这个子卷同样是timeshift要求的必须具有的子
@@ -163,8 +163,8 @@ timeshift要求必须有这个子卷的原因是，timeshift可以用来备份@h
 </p>
 </div>
 </div>
-<div id="outline-container-org784c4f0" class="outline-4">
-<h4 id="org784c4f0"><span class="section-number-4">2.2.3.</span> <code>@var</code></h4>
+<div id="outline-container-orge080b12" class="outline-4">
+<h4 id="orge080b12"><span class="section-number-4">2.2.3.</span> <code>@var</code></h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 这个子卷是用来存放变动数据的子卷，自然要脱离根目录。
@@ -182,8 +182,8 @@ timeshift要求必须有这个子卷的原因是，timeshift可以用来备份@h
 </p>
 </div>
 </div>
-<div id="outline-container-org2f6e2f8" class="outline-4">
-<h4 id="org2f6e2f8"><span class="section-number-4">2.2.4.</span> <code>@opt</code> 和 <code>@local</code></h4>
+<div id="outline-container-orgf9c12ac" class="outline-4">
+<h4 id="orgf9c12ac"><span class="section-number-4">2.2.4.</span> <code>@opt</code> 和 <code>@local</code></h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 这两个子卷是用来放自定义的软件的地方，这两个地方都不需要频繁变动，因此可以打开
@@ -199,8 +199,8 @@ COW。
 </p>
 </div>
 </div>
-<div id="outline-container-orga75f33f" class="outline-4">
-<h4 id="orga75f33f"><span class="section-number-4">2.2.5.</span> <code>@root</code></h4>
+<div id="outline-container-orga76efbd" class="outline-4">
+<h4 id="orga76efbd"><span class="section-number-4">2.2.5.</span> <code>@root</code></h4>
 <div class="outline-text-4" id="text-2-2-5">
 <p>
 这个子卷是root用户家目录的子卷。
@@ -211,8 +211,8 @@ root毕竟也是用户，也是有数据持久化的必要的。
 </p>
 </div>
 </div>
-<div id="outline-container-orgbaa4a27" class="outline-4">
-<h4 id="orgbaa4a27"><span class="section-number-4">2.2.6.</span> <code>@srv</code></h4>
+<div id="outline-container-org95a2eb0" class="outline-4">
+<h4 id="org95a2eb0"><span class="section-number-4">2.2.6.</span> <code>@srv</code></h4>
 <div class="outline-text-4" id="text-2-2-6">
 <p>
 这个子卷排除备份的理由和 <code>@opt</code> 与 <code>@local</code> 的理由一致，这个文件夹中会存放服务文
@@ -222,8 +222,8 @@ root毕竟也是用户，也是有数据持久化的必要的。
 </div>
 </div>
 </div>
-<div id="outline-container-orgc3d5b9e" class="outline-3">
-<h3 id="orgc3d5b9e"><span class="section-number-3">2.3.</span> 交换分区及启动分区</h3>
+<div id="outline-container-org0e18dd2" class="outline-3">
+<h3 id="org0e18dd2"><span class="section-number-3">2.3.</span> 交换分区及启动分区</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 我不打算把内存交换到文件，这个功能需要额外的设置，因此我在磁盘的最后面创建了一个
@@ -236,15 +236,15 @@ root毕竟也是用户，也是有数据持久化的必要的。
 </div>
 </div>
 </div>
-<div id="outline-container-org82cf491" class="outline-2">
-<h2 id="org82cf491"><span class="section-number-2">3.</span> 安装系统</h2>
+<div id="outline-container-org4b21b81" class="outline-2">
+<h2 id="org4b21b81"><span class="section-number-2">3.</span> 安装系统</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 装系统就十分关键了。
 </p>
 </div>
-<div id="outline-container-org3cc1ae9" class="outline-3">
-<h3 id="org3cc1ae9"><span class="section-number-3">3.1.</span> 基本系统安装</h3>
+<div id="outline-container-orgdee5c80" class="outline-3">
+<h3 id="orgdee5c80"><span class="section-number-3">3.1.</span> 基本系统安装</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 安装系统要使用特定的bootstarp工具，Arch有自己的pacstrap而我们的Debian有
@@ -280,8 +280,8 @@ debootstrap，这个工具易用性不如pacstrap但是用好了也不错。
 </p>
 </div>
 </div>
-<div id="outline-container-orgb8715ec" class="outline-3">
-<h3 id="orgb8715ec"><span class="section-number-3">3.2.</span> Bootloader</h3>
+<div id="outline-container-org60ffdd7" class="outline-3">
+<h3 id="org60ffdd7"><span class="section-number-3">3.2.</span> Bootloader</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 千万不要忘了这一步，少了这一步，系统无法启动，然后由于Btrfs特殊的子卷设置，启动
@@ -322,7 +322,7 @@ NixOS与Guix的配置方式较为陡峭，对于新手而言学习曲线较高�
 <div id="postamble" class="status">
 <p class="date">&#26085;&#26399;: 2026-05-31 日 00:00</p>
 <p class="author">&#20316;&#32773;: 维修部部长</p>
-<p class="date">Created: 2026-09-06 日 22:19</p>
+<p class="date">Created: 2026-09-22 二 13:41</p>
 </div>
 </body>
 </html>

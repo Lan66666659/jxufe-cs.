@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
 <head>
-<!-- 2026-09-11 五 16:24 -->
+<!-- 2026-09-15 二 17:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>学校课表至ICS文件转化器</title>
@@ -22,43 +22,91 @@
 <h2>&#30446;&#24405;</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8e725b4">1. 前言</a></li>
-<li><a href="#orgaad6181">2. 综述</a></li>
-<li><a href="#org89712cf">3. 初步设想</a></li>
-<li><a href="#org8bc866c">4. 预实验</a></li>
-<li><a href="#orgcc67a97">5. 第一阶段：分析程序结构</a></li>
-<li><a href="#org466bda2">6. 第二阶段：网络信息获取</a>
+<li><a href="#org4de78a5">1. 前言</a></li>
+<li><a href="#org97c1423">2. 综述</a></li>
+<li><a href="#org50d75d4">3. 初步设想</a>
 <ul>
-<li><a href="#org6405881">6.1. 第一步：获取参数</a></li>
-<li><a href="#org1890e98">6.2. 第二步：组合URI对象</a></li>
-<li><a href="#orgaecd408">6.3. 第三步：获取HTML数据</a></li>
+<li><a href="#orgfdf20e9">3.1. 请求长什么样</a></li>
+<li><a href="#orgbfbb01d">3.2. 怎么拿到cookie</a></li>
 </ul>
 </li>
-<li><a href="#org21cc588">7. 第三阶段：处理HTML数据成为事件的中间表示</a>
+<li><a href="#org35318ba">4. 预实验</a></li>
+<li><a href="#org93d1da1">5. 程序总览</a>
 <ul>
-<li><a href="#orge73a011">7.1. 第一步：转化格式</a></li>
-<li><a href="#org29b3795">7.2. 第二步：选择数据</a></li>
-<li><a href="#org163e3d3">7.3. 第三步：打上标签</a></li>
-<li><a href="#orgcea0189">7.4. 第四步：转化为事件的中间表示</a></li>
-<li><a href="#org04d34ba">7.5. 第五步：筛选与整合</a></li>
-<li><a href="#org5900388">7.6. 第六步：转变为最终表示</a></li>
+<li><a href="#org990a337">5.1. 依赖</a></li>
+<li><a href="#org25958c6">5.2. 配置</a></li>
+<li><a href="#org563501b">5.3. 命令行</a></li>
 </ul>
 </li>
-<li><a href="#org7420fad">8. 第四阶段：转化为ICS事件</a></li>
-<li><a href="#orge200ad7">9. 总结</a></li>
+<li><a href="#orgb082c29">6. 第一阶段：把参数变成一串URI</a>
+<ul>
+<li><a href="#orge4041e6">6.1. 参数解析</a></li>
+<li><a href="#orgbae5e6d">6.2. 周次展开</a></li>
+<li><a href="#orgdf25423">6.3. 构造URI</a></li>
+</ul>
+</li>
+<li><a href="#orgfcc26ab">7. 第二阶段：网络请求</a>
+<ul>
+<li><a href="#orge63c680">7.1. 一次请求要带回三样东西</a></li>
+<li><a href="#org86fb1e1">7.2. 200不等于成功</a></li>
+<li><a href="#orgb93bdce">7.3. 并发与重试</a></li>
+<li><a href="#org4d03e8f">7.4. 超时</a></li>
+</ul>
+</li>
+<li><a href="#org41689f0">8. 第三阶段：把HTML变成带标签的数据</a>
+<ul>
+<li><a href="#orge80beee">8.1. 转成SHTML</a></li>
+<li><a href="#org9dd8451">8.2. 选行与选格子</a></li>
+<li><a href="#org411daa4">8.3. 打标签</a></li>
+</ul>
+</li>
+<li><a href="#org4b2c5b8">9. 第四阶段：事件的中间表示与合并</a>
+<ul>
+<li><a href="#org0469877">9.1. 为什么要规定生成顺序</a></li>
+<li><a href="#org19d4b93">9.2. 合并的判据</a></li>
+<li><a href="#org208f202">9.3. 沿着流折叠</a></li>
+</ul>
+</li>
+<li><a href="#org41b7dfd">10. 第五阶段：算时间</a>
+<ul>
+<li><a href="#org7c90d4c">10.1. 开始时间</a></li>
+<li><a href="#org320d244">10.2. 结束时间要查表，不要套公式</a></li>
+</ul>
+</li>
+<li><a href="#org4ad1e86">11. 第六阶段：生成ICS</a>
+<ul>
+<li><a href="#org904f433">11.1. 属性名</a></li>
+<li><a href="#orgb4f0d93">11.2. UID</a></li>
+<li><a href="#orge839b8b">11.3. LOCATION与VALARM</a></li>
+<li><a href="#org117c20e">11.4. 关于时间的格式</a></li>
+</ul>
+</li>
+<li><a href="#org082a6d7">12. 这些坑是怎么发现的</a>
+<ul>
+<li><a href="#org990c11e">12.1. 留一份能复现问题的测试</a></li>
+</ul>
+</li>
+<li><a href="#org3930704">13. 总结</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8e725b4" class="outline-2">
-<h2 id="org8e725b4"><span class="section-number-2">1.</span> 前言</h2>
+<div id="outline-container-org4de78a5" class="outline-2">
+<h2 id="org4de78a5"><span class="section-number-2">1.</span> 前言</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 此程序通过Guile实现，没有经验的读者可以尝试了解scheme语法。
 </p>
+
+<p>
+本文在2026年9月做过一次重构。第一版能跑通，但生成出来的日历少了若干周、整体晚一
+周，甚至有时候整份文件都导不进日历——而且它一声不吭。重构之后的完整代码在项目仓库
+里，本文按重构后的写法讲，所以下面出现的每一段代码都是能工作的，而不是"看起来应
+该能工作"。
+</p>
 </div>
 </div>
-<div id="outline-container-orgaad6181" class="outline-2">
-<h2 id="orgaad6181"><span class="section-number-2">2.</span> 综述</h2>
+<div id="outline-container-org97c1423" class="outline-2">
+<h2 id="org97c1423"><span class="section-number-2">2.</span> 综述</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 为了解决学生课表不具有日历中事件类似的“按时提醒”、“消息同步”等等功能，我打算
@@ -67,8 +115,8 @@
 </p>
 </div>
 </div>
-<div id="outline-container-org89712cf" class="outline-2">
-<h2 id="org89712cf"><span class="section-number-2">3.</span> 初步设想</h2>
+<div id="outline-container-org50d75d4" class="outline-2">
+<h2 id="org50d75d4"><span class="section-number-2">3.</span> 初步设想</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 对于我校课表，正常的查询路径是打开智慧江财平台，并在其中打开“我的课表”应用来查
@@ -83,8 +131,8 @@
 
 <p>
 而且，学校还为我们编写类似程序提供了一个便捷的通路：通过微信办事大厅请求课表，只
-要求三个参数和一个cookie，分别是、请求载荷、学期、周数和一个包含 <code>JSESSIONID</code> 的
-<code>cookie</code> 。只要我们的请求具有这四个东西，就可以成功获取信息，其中，请求载荷甚至
+要求几个参数和一个cookie，分别是请求载荷、学期、周数和一个包含 <code>JSESSIONID</code> 的
+cookie。只要我们的请求具有这些东西，就可以成功获取信息，其中，请求载荷甚至
 是固定的，只需要硬编码即可。
 </p>
 
@@ -99,9 +147,44 @@
 这一部分将会在导入到日历后由使用者自行调整。
 </p>
 </div>
+<div id="outline-container-orgfdf20e9" class="outline-3">
+<h3 id="orgfdf20e9"><span class="section-number-3">3.1.</span> 请求长什么样</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+把浏览器开发者工具打开，在“我的课表”页面里看一眼那个请求，长这样：
+</p>
+
+<pre class="example" id="orga76416b">
+GET /filter/student_schedule?href=&lt;一串base64&gt;&amp;weeks=3&amp;xnxq=2026,0
+Host: &lt;办事大厅网关&gt;
+Cookie: JSESSIONID=&lt;一串十六进制&gt;
+</pre>
+
+<p>
+其中 <code>href</code> 是一个固定不变的载荷，内容是课表详情页的地址，用base64编码过<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>。
+<code>xnxq</code> 是学年学期， <code>weeks</code> 是要查的周次。四个东西齐了就能拿到数据，这也是整个程序
+中最省事的一步。
+</p>
 </div>
-<div id="outline-container-org8bc866c" class="outline-2">
-<h2 id="org8bc866c"><span class="section-number-2">4.</span> 预实验</h2>
+</div>
+<div id="outline-container-orgbfbb01d" class="outline-3">
+<h3 id="orgbfbb01d"><span class="section-number-3">3.2.</span> 怎么拿到cookie</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+这是读者最容易卡住的地方，所以单独说一句： <code>JSESSIONID</code> 只能在 <b>已经登录</b> 的浏览器里
+拿。打开智慧江财、进“我的课表”，按F12打开开发者工具，切到“网络”标签，刷新页面，找
+到那个请求，在请求头里把 <code>Cookie</code> 一整行的值复制出来即可。
+</p>
+
+<p>
+cookie会过期（换设备、退出登录、放太久都会失效），过期之后服务器不会返回403，而是
+返回一个HTTP 200的错误页——这一点后面还会反复提到，是整个程序里最坑的一条。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org35318ba" class="outline-2">
+<h2 id="org35318ba"><span class="section-number-2">4.</span> 预实验</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 所谓预实验就是在正式实验之前进行的实验，可以确定正式实验的正确性，并给正式实验参
@@ -113,23 +196,18 @@
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc67a97" class="outline-2">
-<h2 id="orgcc67a97"><span class="section-number-2">5.</span> 第一阶段：分析程序结构</h2>
+<div id="outline-container-org93d1da1" class="outline-2">
+<h2 id="org93d1da1"><span class="section-number-2">5.</span> 程序总览</h2>
 <div class="outline-text-2" id="text-5">
 <p>
-此程序的行为是线性的，因此可以使用流水线的方式编写。
+正式实现的程序结构是线性的，数据沿着一条流水线流动，每一步都是
+<code>Stream -&gt; Stream</code> ：
 </p>
 
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(chain (get-url datas)
-       (fetch-url _)
-       (process-html _)
-       (select-classes _)
-       (merge-same-classes _)
-       (produce-event _)
-       (write-to-file _ file))
-</code></pre>
-</div>
+<pre class="example" id="org5c04f39">
+参数 -&gt; 周次 -&gt; URI -&gt; HTTP -&gt; HTML -&gt; SHTML -&gt; 课表行 -&gt; 带标签的数据
+     -&gt; 事件中间表示 -&gt; 合并 -&gt; 计算时间 -&gt; VEVENT -&gt; VCALENDAR -&gt; 文件
+</pre>
 
 <p>
 对于其中传递的数据可以使用“流”数据结构进行抽象。流具有惰性计算的特性，可以减少
@@ -139,10 +217,10 @@
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code><span style="color: #656565;">;;; </span><span style="color: #656565;">List Example
-</span>(<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (nums) (+ num 1)) '(1 2 3)) <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; (2 3 4)
+</span>(<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (num) (+ num 1)) '(1 2 3)) <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; (2 3 4)
 </span>
 <span style="color: #656565;">;;; </span><span style="color: #656565;">Stream Example
-</span>(stream-map (<span style="color: #ffa348; font-weight: bold;">lambda</span> (numbs) (+ num 1))
+</span>(stream-map (<span style="color: #ffa348; font-weight: bold;">lambda</span> (num) (+ num 1))
             (list-&gt;stream '(1 2 3))) <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; #&lt;stream (2 3 4)&gt;</span>
 </code></pre>
 </div>
@@ -177,29 +255,176 @@
   (stream-map handle-elements stream))
 </code></pre>
 </div>
+</div>
+<div id="outline-container-org990a337" class="outline-3">
+<h3 id="org990a337"><span class="section-number-3">5.1.</span> 依赖</h3>
+<div class="outline-text-3" id="text-5-1">
+<ul class="org-ul">
+<li><a href="https://www.gnu.org/software/guile/">Guile</a> 3.0</li>
+<li><code>guile-ics</code> 0.7.0（提供 <code>(ics)</code> 、 <code>(ics object)</code> 、 <code>(ics type property)</code> ）</li>
+<li><code>htmlprag</code> （提供 <code>(htmlprag)</code> ，即 <code>html-&gt;shtml</code> ）</li>
+<li><code>SRFI-41</code> 提供流，=SRFI-197= 提供 <code>chain</code> ， <code>SRFI-1</code> 、 <code>SRFI-13</code> 、
+<code>SRFI-37</code> 等提供各种列表与字符串过程</li>
+</ul>
 
 <p>
-而对于流的具体实现，我使用 <a href="https://srfi.schemers.org/srfi-41/">SRFI-41</a> 实现。
-</p>
-</div>
-</div>
-<div id="outline-container-org466bda2" class="outline-2">
-<h2 id="org466bda2"><span class="section-number-2">6.</span> 第二阶段：网络信息获取</h2>
-<div class="outline-text-2" id="text-6">
-<p>
-结合初步设想中发现的种种优势，网络信息获取的过程会相当简单。简单说，分三步，第一
-步，从终端中获取各项参数，第二步，构建载荷，第三步，发送并获取课表信息。
-</p>
-</div>
-<div id="outline-container-org6405881" class="outline-3">
-<h3 id="org6405881"><span class="section-number-3">6.1.</span> 第一步：获取参数</h3>
-<div class="outline-text-3" id="text-6-1">
-<p>
-对于命令行参数解析，我打算使用 <a href="https://srfi.schemers.org/srfi-37/">SRFI-37</a> 标准中的 <code>args-fold</code> 实现。
+这里要专门说明一下 <code>chain</code> ：它来自 <a href="https://srfi.schemers.org/srfi-197/">SRFI-197</a>，作用是像管线一样把
+一串函数串起来， <code>_</code> 是上一个函数的返回值插入的位置：
 </p>
 
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(chain 3
+       (+ 1 _)
+       (* 2 _))  <span style="color: #656565;">;</span><span style="color: #656565;">=&gt; 8</span>
+</code></pre>
+</div>
+
 <p>
-如果把命令看作一个函数，那么这个函数必须接受至少四个信息才能正常工作：
+用它写流水线可以让代码的形状和数据的流向一致，前文的代码片段里大量用到了它。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">use-modules</span> (srfi srfi-197)  <span style="color: #656565;">; </span><span style="color: #656565;">chain
+</span>             (srfi srfi-41)   <span style="color: #656565;">; </span><span style="color: #656565;">&#27969;
+</span>             (srfi srfi-37)   <span style="color: #656565;">; </span><span style="color: #656565;">args-fold
+</span>             (srfi srfi-19)   <span style="color: #656565;">; </span><span style="color: #656565;">&#26102;&#38388;
+</span>             (srfi srfi-13)   <span style="color: #656565;">; </span><span style="color: #656565;">&#23383;&#31526;&#20018;
+</span>             (srfi srfi-11)   <span style="color: #656565;">; </span><span style="color: #656565;">let-values
+</span>             (srfi srfi-1)    <span style="color: #656565;">; </span><span style="color: #656565;">&#21015;&#34920;
+</span>             (web response)
+             (web client)
+             (web uri)
+             ((sxml xpath) <span style="color: #7d8ac7;">#:prefix</span> sx:)
+             (ice-9 threads)
+             (ice-9 regex)
+             (ice-9 format)
+             (oop goops)
+             (ics)
+             (ics object)
+             (ics type property)
+             (htmlprag))
+</code></pre>
+</div>
+
+<p>
+注意 <code>(sxml xpath)</code> 是用 <code>#:prefix sx:</code> 引入的，所以后面 <code>sxpath</code> 要写成 <code>sx:sxpath</code> ，
+免得和别的库重名。主要的重名发生在 <code>filter</code> 函数上，SXPath库中实现了一个柯里化的
+过滤器函数，此函数可以用来过滤节点集，和标准的过滤器的不同是，标准过滤器只会根据
+返回值是否是布尔假来判断，这个过滤器会用空集和布尔假的方式来判断。
+</p>
+</div>
+</div>
+<div id="outline-container-org25958c6" class="outline-3">
+<h3 id="org25958c6"><span class="section-number-3">5.2.</span> 配置</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+主机名、路径、上课时间表、合并规则这些都不写在代码里，而是放在脚本旁边的
+<code>config.scm</code> 中。这样换一台机器只需要改配置文件，顺便也避免把学校的内部地址硬编码
+进仓库。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>((uri-conf .
+           ((host . <span style="color: #5bc8af;">"&lt;&#21150;&#20107;&#22823;&#21381;&#32593;&#20851;&gt;"</span>)
+            (port . <span style="color: #5bc8af; font-weight: bold;">&lt;&#31471;&#21475;&gt;</span>)
+            (path . <span style="color: #5bc8af;">"/filter/student_schedule"</span>)
+            (static-frag . ((<span style="color: #5bc8af;">"href"</span> . <span style="color: #5bc8af;">"&lt;&#22266;&#23450;&#36733;&#33655;&#30340;base64&gt;"</span>)))))
+ (path-conf .
+            ((select-data-path . (html body html body div table tbody tr))
+             (info-cell-path . (ul))
+             (time-path . ((td (@ (equal? (valign <span style="color: #5bc8af;">"middle"</span>))))))
+             (days-per-week . 7)))
+ (table-process-conf .
+                     ((mergable-time-list . ((0 1 2 3 4) (5 6 7 8) (9 10 11)))
+                      (on-class-length . 2700)
+                      (off-class-length . 300)))
+ (http-conf .
+            ((retries . 6) (retry-delay . 1.5)
+             (jobs . 1) (request-delay . 0.3) (timeout . 30)
+             (max-auth-failures . 3)
+             (error-markers . (<span style="color: #5bc8af;">"&#20973;&#35777;&#24050;&#22833;&#25928;"</span> <span style="color: #5bc8af;">"&#35831;&#37325;&#26032;&#30331;&#24405;"</span> <span style="color: #5bc8af;">"&#31995;&#32479;&#25552;&#31034;"</span> <span style="color: #5bc8af;">"login"</span>))))
+ <span style="color: #656565;">;; </span><span style="color: #656565;">&#27599;&#19968;&#33410;&#35838;&#30340;&#24320;&#22987;&#26102;&#38388;&#65292;&#20174;0&#28857;&#36215;&#30340;&#31186;&#25968;
+</span> (class-table-data . #(28800 31800 35700 38700 41700 50400
+                       53400 57300 60300 67200 70200 73200))
+ (ics-conf .
+           ((jxufe-prodid . <span style="color: #5bc8af;">"-//Final Infinity//Class Table//CN"</span>)
+            (tigger-conf . ((before . <span style="color: #5bc8af;">"-PT15M"</span>) (action . <span style="color: #5bc8af;">"DISPLAY"</span>))))))
+</code></pre>
+</div>
+
+<p>
+读配置的部分就是一个普通的关联列表查找，唯一值得一提的是配置文件的位置：优先用当前
+目录下的 <code>config.scm</code> ，找不到就退回到脚本旁边的那一个，这样既方便在项目目录里跑，
+也可以直接把脚本丢进 <code>PATH</code> 。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (config-file-path)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#37197;&#32622;&#25991;&#20214;&#40664;&#35748;&#25918;&#22312;&#33050;&#26412;&#26049;&#36793;&#65307;&#22914;&#26524;&#22312;&#24403;&#21069;&#30446;&#24405;&#19979;&#33021;&#25214;&#21040;&#23601;&#20248;&#20808;&#20351;&#29992;&#24403;&#21069;&#30446;&#24405;&#30340;&#12290;
+</span>  (<span style="color: #ffa348; font-weight: bold;">if</span> (file-exists? <span style="color: #5bc8af;">"config.scm"</span>)
+      <span style="color: #5bc8af;">"config.scm"</span>
+      (<span style="color: #ffa348; font-weight: bold;">let</span> ((script (current-filename)))
+        (<span style="color: #ffa348; font-weight: bold;">if</span> script
+            (<span style="color: #ffa348; font-weight: bold;">let</span> ((here (dirname script)))
+              (in-vicinity here <span style="color: #5bc8af;">"config.scm"</span>))
+            <span style="color: #5bc8af;">"config.scm"</span>))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> config-alist
+  (<span style="color: #ffa348; font-weight: bold;">call-with-input-file</span> (config-file-path) read))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (config-section name)
+  (<span style="color: #ffa348; font-weight: bold;">or</span> (assoc-ref config-alist name) '()))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (config-ref section key default)
+  (<span style="color: #ffa348; font-weight: bold;">let</span> ((entry (assoc key (config-section section))))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> entry (cdr entry) default)))
+</code></pre>
+</div>
+
+<p>
+以上是用来实现配置系统的代码，其中实现了自动的配置文件定位以及对配置项的索引，在
+配置项没有找到的情况下，其会自行使用默认配置项。有了这层间接，代码里出现的就是
+<code>class-table-host</code> 、 <code>mergable-time-list</code> 这样的名字，而不是散落各处的魔法值：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> uri-conf (config-section 'uri-conf))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> class-table-host (assoc-ref uri-conf 'host))
+(<span style="color: #ffa348; font-weight: bold;">define</span> class-table-port (assoc-ref uri-conf 'port))
+(<span style="color: #ffa348; font-weight: bold;">define</span> class-table-path (assoc-ref uri-conf 'path))
+(<span style="color: #ffa348; font-weight: bold;">define</span> static-data-alist (assoc-ref uri-conf 'static-frag))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> select-data-path
+  (config-ref 'path-conf 'select-data-path '(html body html body div table tbody tr)))
+
+<span style="color: #656565;">;; </span><span style="color: #656565;">&#27599;&#20010;&#21333;&#20803;&#26684;&#65288;&#19968;&#33410;&#35838;&#30340;&#20301;&#32622;&#65289;&#26159;&#33509;&#24178;&#20010; &lt;ul&gt;&#65292;&#30495;&#27491;&#30340;&#25991;&#23383;&#22312;&#36825;&#20123; &lt;ul&gt; &#37324;&#38754;&#12290;
+</span>(<span style="color: #ffa348; font-weight: bold;">define</span> info-cell-path
+  (config-ref 'path-conf 'info-cell-path '(ul)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> time-path
+  (config-ref 'path-conf 'time-path '((td (@ (equal? (valign <span style="color: #5bc8af;">"middle"</span>)))))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> mergable-time-list
+  (assoc-ref (config-section 'table-process-conf) 'mergable-time-list))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> on-class-length
+  (assoc-ref (config-section 'table-process-conf) 'on-class-length))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> class-table-data (assoc-ref config-alist 'class-table-data))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (lookup-time time)
+  (vector-ref class-table-data time))
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org563501b" class="outline-3">
+<h3 id="org563501b"><span class="section-number-3">5.3.</span> 命令行</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+命令行参数解析用 <a href="https://srfi.schemers.org/srfi-37/">SRFI-37</a> 标准中的 <code>args-fold</code> 实现。如果把命令看
+作一个函数，那么这个函数必须接受至少四个信息才能正常工作：
 </p>
 
 <ul class="org-ul">
@@ -214,12 +439,12 @@
 </p>
 
 <ul class="org-ul">
-<li><code>-s</code> <code>--semester</code> ：请求学期，以 <code>YYYY,S</code> 格式编码。示例：2026,0表示2026-2027
-学年第一学期。</li>
+<li><code>-s</code> <code>--semester</code> ：请求学期，以 <code>YYYY,S</code> 格式编码。示例： <code>2026,0</code> 表示
+2026-2027学年第一学期。</li>
 
 <li><code>-d</code> <code>--start-date</code> ：开始时间，以 <code>YYYY-MM-DD</code> 格式编码，通过开始时间，我们
-得以以递推的形式求得每一个事件的具体时间。另外，由于软件实现的问题，这个时间
-必须是周一，否则递推会不准确。</li>
+得以以递推的形式求得每一个事件的具体时间。另外，由于实现的问题，这个时间必须是
+第1周的周一，否则递推会不准确，程序会给出警告<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>。</li>
 
 <li><p>
 <code>-w</code> <code>--weeks</code> ：请求周次，以 <code>[0-9\,\-]+</code> 格式编码，这种格式可以展开为一个周
@@ -233,89 +458,105 @@
 </code></pre>
 </div></li>
 
-<li><code>-c</code> <code>--cookie</code> ：cookie信息，一个十六进制值。为了简便起见，我不使用完整的
-cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行拼接来构建cookie。</li>
+<li><code>-c</code> <code>--cookie</code> ： <code>JSESSIONID</code> 的值。程序会自动去掉你可能一起复制进来的
+<code>JSESSIONID=</code> 前缀和首尾空白，所以整行粘进来也能用。</li>
 </ul>
 
 <p>
-对于具体实现方式，请参见 <code>args-fold</code> 文档并结合读者的自行思考，这里只给出一些可
-能的要点：
+此外还有一些调试用的选项： <code>-j</code> 调整并发数， <code>-r</code> 调整重试次数， <code>-t</code> 调整请求间隔，
+<code>-S</code> 把抓到的原始HTML存下来， <code>-L</code> 则不联网、直接读入之前存下的HTML， <code>-v</code> 打印细
+节， <code>--strict</code> 让“有任何一周抓取失败”变成非零退出码。 <code>--help</code> 里有完整列表。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb082c29" class="outline-2">
+<h2 id="orgb082c29"><span class="section-number-2">6.</span> 第一阶段：把参数变成一串URI</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-orge4041e6" class="outline-3">
+<h3 id="orge4041e6"><span class="section-number-3">6.1.</span> 参数解析</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+<code>args-fold</code> 的过程需要第四个参数是一个处理器，这个处理器接受三个以上参数，而对于多
+出的参数，按照标准是SEEDS。
 </p>
 
 <p>
-<code>option</code> 过程需要第四个选项是一个处理器，这个处理器接受三个以上参数，而对于多出
-的参数，按照标准是SEEDS，可以通过点对符号来将其打包声明为一个列表，同时，此函数
-的返回值作为下一个函数的SEEDS参数传递，此时不能直接返回一个列表，否则，再经历一
-次点对符号的打包声明，结果就会成为一个嵌套的列表，随着处理的深入，列表只会越嵌套
-越深。
+第一版的写法是让每个处理器返回 <code>(values semester date weeks cookie)</code> ，四个值分别
+往下传。这样写有两个毛病：一是每加一个选项就要把所有处理器的形参列表和返回值都改一
+遍；二是返回值的位置成了唯一的信息通道，加错一个位置就会静默地把cookie写进学期里。
 </p>
 
 <p>
-在这种情况下，请使用 <code>values</code> 过程来实现多参数传递。同时记得，一定要在
-<code>args-fold</code> 中把所有的参数给出来，如果没有，就会报出参数数量不符的错误。
-</p>
-
-<p>
-当然，根据开闭原则，更好的做法可能是使用 <code>alist</code> 传递信息，因为这个数据结构可以
-实现添加新选项时不需要改动其他处理器。
-</p>
-
-<p>
-对于以上要求可以编写参数处理器：
+现在的写法是让所有选项都往同一个关联列表里塞，也就是教程里常说的开闭原则——增加新
+选项时不需要改动其它处理器：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> option-list
   (list (option '(#\s <span style="color: #5bc8af;">"semester"</span>) #t #t
-                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
-                  (values arg date weeks cookie)))
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg . seeds)
+                  (values (acons 'semester arg (car seeds)))))
         (option '(#\d <span style="color: #5bc8af;">"start-date"</span>) #t #t
-                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
-                  (values semester arg weeks cookie)))
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg . seeds)
+                  (values (acons 'start-date arg (car seeds)))))
         (option '(#\w <span style="color: #5bc8af;">"weeks"</span>) #t #t
-                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
-                  (values semester date arg cookie)))
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg . seeds)
+                  (values (acons 'weeks arg (car seeds)))))
         (option '(#\c <span style="color: #5bc8af;">"cookie"</span>) #t #t
-                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg semester date weeks cookie)
-                  (values semester date weeks arg)))))
-
-(<span style="color: #ffa348; font-weight: bold;">define</span> (handle-oprand oprand . seeds)
-  (format #t <span style="color: #5bc8af;">"Wrong Arg: ~s~%"</span> oprand)
-  (quit 1))
-(<span style="color: #ffa348; font-weight: bold;">define</span> (handle-unknown-opt opt name arg . seeds)
-  (format #t <span style="color: #5bc8af;">"Wrong Opt ~s with Arg ~s~%"</span> name arg)
-  (quit 1))
-
-(args-fold (cdr (command-line)) handle-unknown-opt handle-oprand
-           '() '() '() '())
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg . seeds)
+                  (values (acons 'cookie arg (car seeds)))))
+        <span style="color: #656565;">;; </span><span style="color: #656565;">&#8230;&#8230;&#20854;&#20313;&#36873;&#39033;&#30053;
+</span>        (option '(#\h <span style="color: #5bc8af;">"help"</span>) #f #f
+                (<span style="color: #ffa348; font-weight: bold;">lambda</span> (opt name arg . seeds)
+                  (display-help)
+                  (quit 0)))))
 </code></pre>
 </div>
 
 <p>
-当然以上的代码只是一个示例，实际上的脚本会更加复杂。
+这里有两个坑。第一个是种子必须用点对符号收起来（ <code>. seeds</code> ），因为 <code>args-fold</code> 会把
+种子作为多个返回值交出来，直接用形参接会报参数个数不符。
 </p>
 
 <p>
-在得到以上参数的时候，我们即可开始下一阶段。
+第二个坑更要命：种子不能直接返回一个列表。如果我们返回一个列表， <code>args-fold</code> 会再
+把它和其它种子打包一次，结果是列表越套越深。所以处理器要用 <code>values</code> 返回，而
+<code>args-fold</code> 的最终接收也要用点对符号把多个返回值收起来再取第一个：
 </p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(call-with-values
+    (<span style="color: #ffa348; font-weight: bold;">lambda</span> ()
+      (args-fold (cdr args)
+                 option-list
+                 handle-unknown-opt
+                 handle-operand
+                 '()))
+  <span style="color: #656565;">;; </span><span style="color: #656565;">args-fold &#25226;&#21508;&#20010; seed &#20316;&#20026;&#22810;&#20010;&#36820;&#22238;&#20540;&#32473;&#20986;&#65307;&#36825;&#37324;&#21482;&#26377;&#19968;&#20010; seed
+</span>  <span style="color: #656565;">;; </span><span style="color: #656565;">&#65288;&#19968;&#20010; alist&#65289;&#65292;&#29992;&#28857;&#23545;&#21442;&#25968;&#25910;&#36215;&#26469;&#20877;&#21462;&#31532;&#19968;&#20010;&#12290;
+</span>  (<span style="color: #ffa348; font-weight: bold;">lambda</span> seeds (<span style="color: #ffa348; font-weight: bold;">if</span> (null? seeds) '() (car seeds))))
+</code></pre>
+</div>
+
+<p>
+<code>handle-operand</code> 用来接最后一个不带选项的输出文件名：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (handle-operand ope . seeds)
+  (values (acons 'file ope (car seeds))))
+</code></pre>
 </div>
 </div>
-<div id="outline-container-org1890e98" class="outline-3">
-<h3 id="org1890e98"><span class="section-number-3">6.2.</span> 第二步：组合URI对象</h3>
+</div>
+<div id="outline-container-orgbae5e6d" class="outline-3">
+<h3 id="orgbae5e6d"><span class="section-number-3">6.2.</span> 周次展开</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
-这一阶段主要由两步组成，一个是组合URI对象，另一个就是执行http请求。
-</p>
-
-<p>
-通过周数参数，我们可以获得需要生成哪些周次的信息，这些信息全部记录在参数字符串中。
-有了这些信息，以及相对固定不变的其他各项信息，我们可以相对轻松的组织URI对象。
-</p>
-
-<p>
-在组合URI之前，首先把周次展开，周次可以看作由逗号分隔的，可能是单个周也可能是一
-个周组的列表。同时一个周组可以看作是一个记录着起始和结束信息的一对信息。在周组生
-成之后，可以拉平为一个列表
+周次可以看作由逗号分隔的、可能是单个周也可能是一个周组的列表。同时一个周组可以看作
+是一个记录着起始和结束信息的一对信息。在周组生成之后，可以拉平为一个列表。
 </p>
 
 <p>
@@ -336,22 +577,25 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
   (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week-or-week-range input)
 
     (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week-range)
-      (<span style="color: #ffa348; font-weight: bold;">let*</span> ((range-group
-              (<span style="color: #ffa348; font-weight: bold;">map</span> string-&gt;num (string-split #\- input)))
+      (<span style="color: #ffa348; font-weight: bold;">let*</span> ((range-group (<span style="color: #ffa348; font-weight: bold;">map</span> string-&gt;number (string-split input #\-)))
              (start (list-ref range-group 0))
              (stop (list-ref range-group 1)))
-        (range start stop)))
+        (<span style="color: #ffa348; font-weight: bold;">if</span> (&gt; start stop)
+            (range stop start)      <span style="color: #656565;">; </span><span style="color: #656565;">5-3 &#20063;&#25509;&#21463;&#65292;&#31561;&#20215;&#20110; 3-5
+</span>            (range start stop))))
 
-    (<span style="color: #ffa348; font-weight: bold;">define</span> (hadnle-week)
-      (list (string-&gt;num input)))
+    (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week)
+      (list (string-&gt;number input)))
 
     (<span style="color: #ffa348; font-weight: bold;">if</span> (string-contains input <span style="color: #5bc8af;">"-"</span>)
         (handle-week-range)
         (handle-week)))
 
-  (chain (string-split #\, week-str)
+  (chain (string-split week-str #\,)
          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-week-or-week-range _)
-         (concatnate _)
+         (apply append _)
+         (delete-duplicates _)
+         (sort _ &lt;)
          (list-&gt;stream _)))
 </code></pre>
 </div>
@@ -365,16 +609,22 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 
 <p>
 得到这些之后把结果组织为列表，这样就是一个列表套列表的结构，但是这种结构后续处理
-时不好处理，因此需要拉平为一个列表。具体来说就是使用 <code>concatnate</code> 函数，这个函数
-在 <a href="https://srfi.schemers.org/srfi-1">SRFI-1</a> 中有定义，我不打算细说。
+时不好处理，因此需要拉平为一个列表，这里用的是 <code>(apply append _)</code> 。之后还顺手做了
+去重和排序，这样 <code>-w 5,1,3-4,2</code> 和 <code>-w 1-5</code> 会得到完全一样的结果——周次最终会变成
+请求的顺序，顺序稳定才好排查问题。
 </p>
 
 <p>
-在得到这个列表之后，我们需要将列表映射为一个流来方便处理。
+实际代码里还多做了一件事：对每个周次做一遍合法性检查，非正整数或者空字符串就当场报
+错退出，而不是让它变成一个畸形的URI再被服务器拒绝。这种检查放在越早越好。
 </p>
-
+</div>
+</div>
+<div id="outline-container-orgdf25423" class="outline-3">
+<h3 id="orgdf25423"><span class="section-number-3">6.3.</span> 构造URI</h3>
+<div class="outline-text-3" id="text-6-3">
 <p>
-对于周数流，我们可以在得到学期信息后来构建URI对象，由此定义
+有了周次流，就可以构建URI对象了。
 </p>
 
 <div class="org-src-container">
@@ -382,131 +632,360 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 </code></pre>
 </div>
 
+<p>
+先是把关联列表拼成查询字符串：
+</p>
+
 <div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (build-frag-from-alist alist)
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (build-query-from-alist alist)
   (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry entry)
     (<span style="color: #ffa348; font-weight: bold;">let</span> ((key (car entry))
           (val (cdr entry)))
       (string-append key <span style="color: #5bc8af;">"="</span> val)))
   (<span style="color: #ffa348; font-weight: bold;">define</span> (merge-to-string str-list)
     (<span style="color: #ffa348; font-weight: bold;">define</span> (concat-two-string str1 str2)
-      (append str1 <span style="color: #5bc8af;">"&amp;"</span> str2))
-    (reduce concat-two-string str-list))
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (prepend-question-mark str)
-    (append <span style="color: #5bc8af;">"?"</span> str))
+      (string-append str1 <span style="color: #5bc8af;">"&amp;"</span> str2))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (null? str-list)
+        <span style="color: #5bc8af;">""</span>
+        (reduce concat-two-string <span style="color: #5bc8af;">""</span> str-list)))
   (chain (<span style="color: #ffa348; font-weight: bold;">map</span> handle-entry alist)
-         (merge-to-string _)
-         (prepend-question-mark _)))
+         (merge-to-string _)))
+</code></pre>
+</div>
 
-(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-uri week-stream semester)
+<p>
+这里的思路是用关联列表与查询字符串列表的相似性来编写代码：每一个条目中的键值对中间
+用等号连接，条目之间用“&amp;”连接。
+</p>
+
+<p>
+然后是组装URI：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-uri week-stream semester)
   (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week)
     (build-uri 'http
-               <span style="color: #7d8ac7;">#:host</span> school-host
+               <span style="color: #7d8ac7;">#:host</span> class-table-host
+               <span style="color: #7d8ac7;">#:port</span> class-table-port
                <span style="color: #7d8ac7;">#:path</span> class-table-path
-               <span style="color: #7d8ac7;">#:fragments</span> (chain static-data-alist
-                                  (acons <span style="color: #5bc8af;">"weeks"</span> week _)
-                                  (acons <span style="color: #5bc8af;">"xqxn"</span> semester _)
-                                  (build-frag-from-alist _)))
-    )
+               <span style="color: #7d8ac7;">#:query</span> (chain static-data-alist
+                              (acons <span style="color: #5bc8af;">"weeks"</span> (number-&gt;string week) _)
+                              (acons <span style="color: #5bc8af;">"xnxq"</span> semester _)
+                              (build-query-from-alist _))))
   (stream-map handle-week week-stream))
 </code></pre>
 </div>
 
 <p>
-其中使用到的库有 <code>(web uri)</code> 。
-</p>
-
-<p>
-另外，其中出现的 <code>static-data-alist</code> <code>class-table-path</code> 以及 <code>school-host</code> 是几
-个预定义的数据，具体值将不会出示，在附件中可以获取。
-</p>
-
-<p>
-以上代码处理周数数据自顶向下分两步：
-</p>
-
-<ul class="org-ul">
-<li>首先，组建URI对象，根据提前定义的值和 <code>fragments</code> 以及周数，我们得以构建URI。</li>
-
-<li>其次，构建 <code>fragments</code> 参数字符串，我们可以通过关联列表与Fragments列表的相似
-性来编写代码，在每一个条目中的键值对中间使用等号来连接，而对于条目之间，使用
-“&amp;”连接，最后在前方添加一个 “?” 即可。</li>
-</ul>
-
-<p>
-这样就可以构建出URI来了。
-</p>
-</div>
-</div>
-<div id="outline-container-orgaecd408" class="outline-3">
-<h3 id="orgaecd408"><span class="section-number-3">6.3.</span> 第三步：获取HTML数据</h3>
-<div class="outline-text-3" id="text-6-3">
-<p>
-在这一步，需要快速的对文件进行下载，否则Cookie过期就会导致下载数据不完整，这里推
-荐使用多线程下载来提高速度。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-plain"><code>make-http-request ::= Stream uri -&gt; Stream html
-</code></pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-http-request uri-strm cookie)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-uri uri)
-
-    (<span style="color: #ffa348; font-weight: bold;">define</span> (perfrom-request)
-      (http-get
-       uri
-       <span style="color: #7d8ac7;">#:headers</span>
-       `((Cookies . ,(string-append <span style="color: #5bc8af;">"JSESSIONID="</span> cookie)))))
-    (<span style="color: #ffa348; font-weight: bold;">let-values</span> (((stat body) perfrom-request))
-      (<span style="color: #ffa348; font-weight: bold;">if</span> (equal? 200 (response-code stat))
-          body
-          (quit 2))))
-
-  (chain (stream-&gt;list uri-strm)
-         (par-map handle-uri _)
-         (list-&gt;stream _)))
-</code></pre>
-</div>
-
-<p>
-上面的代码使用到了这些库： <code>(web client)</code> <code>(ice-9 threads)</code>
-</p>
-
-<p>
-这里，我把传入的 <code>cookie</code> 变量与 <code>JSESSIONID=</code> 进行拼接，这也就可以得到符合格式
-的Cookies。只有这样服务器才可以辨认身份，同时鉴权。
-</p>
-
-<p>
-另外， <code>http-get</code> 函数的返回值是两个，第一个是http连接的状态，第二个是实际接受的
-数据，所以我们需要把这两个值解构出来并返回我们需要的实际接受数据。
-</p>
-
-<p>
-当然，需要按照返回状态来进行分支，如果不是一个成功的请求，则应该弹出，并报错，如
-果是一个成功的请求，就按照上面的流程继续做。
+这里有一个第一版踩过的错： <code>?weeks=3&amp;xnxq=2026,0</code> 这一串是URI的*query*，不是
+*fragment*。第一版用的是 <code>#:fragments</code> ，而 <code>build-uri</code> 根本没有这个关键字，拼出来
+的URL自然也不是服务器期待的样子。URI的这几个部分看着像，含义完全不同——fragment
+是 <code>#</code> 后面那段，压根不会发给服务器。
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org21cc588" class="outline-2">
-<h2 id="org21cc588"><span class="section-number-2">7.</span> 第三阶段：处理HTML数据成为事件的中间表示</h2>
+<div id="outline-container-orgfcc26ab" class="outline-2">
+<h2 id="orgfcc26ab"><span class="section-number-2">7.</span> 第二阶段：网络请求</h2>
 <div class="outline-text-2" id="text-7">
-<p>
-这一阶段主要分为四个步骤：
-</p>
 </div>
-<div id="outline-container-orge73a011" class="outline-3">
-<h3 id="orge73a011"><span class="section-number-3">7.1.</span> 第一步：转化格式</h3>
+<div id="outline-container-orge63c680" class="outline-3">
+<h3 id="orge63c680"><span class="section-number-3">7.1.</span> 一次请求要带回三样东西</h3>
 <div class="outline-text-3" id="text-7-1">
 <p>
-上一阶段成功获得了HTML的字符串，有了这些字符串，我们就可以尝试将其解析为Guile可
-以理解的格式，并加以处理。
+朴素的想法是“发一个GET，拿回HTML字符串”，但真实情况下我们需要三样东西：状态码
+（判断HTTP层是否正常）、响应体（判断内容是否真的是课表），以及**服务器新发的
+cookie**——办事大厅会在响应里通过 <code>Set-Cookie</code> 换发新的 <code>JSESSIONID</code> ，如果我们一直
+用最初那一个，中途就会突然全部失败。
 </p>
 
+<p>
+所以把它写成一个返回三个值的函数：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (raw-http-get uri cookie)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#36820;&#22238;&#19977;&#20010;&#20540;&#65306;&#29366;&#24577;&#30721;&#12289;body&#12289;&#26381;&#21153;&#22120;&#26032;&#21457;&#30340; cookie&#65288;&#27809;&#26377;&#23601;&#26159; #f&#65289;
+</span>  (call-with-values
+      (<span style="color: #ffa348; font-weight: bold;">lambda</span> ()
+        (http-get uri
+                  <span style="color: #7d8ac7;">#:keep-alive?</span> #f
+                  <span style="color: #7d8ac7;">#:headers</span>
+                  `((Cookie . ,(string-append <span style="color: #5bc8af;">"JSESSIONID="</span> cookie))
+                    (Accept . <span style="color: #5bc8af;">"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"</span>)
+                    (User-Agent . ,http-user-agent))))
+    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (response body)
+      (values (response-code response) body (header-set-cookie response)))))
+</code></pre>
+</div>
+
+<p>
+注意请求头的名字是 <code>Cookie</code> （单数）。第一版写成了 <code>Cookies</code> ，服务器会直接忽略这个
+未知的头，于是每一次请求都是“没登录”的状态，而这个错误不会有任何报错——只会表现为
+抓不到数据。
+</p>
+
+<p>
+三种值用 <code>call-with-values</code> 送出，用 <code>let-values</code> 接收：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">let-values</span> (((code body new-cookie) (apply values (cdr result))))
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#26381;&#21153;&#22120;&#25442;&#20102; session &#23601;&#29992;&#26032;&#30340;&#65288;&#19981;&#31649;&#36825;&#27425;&#25104;&#21151;&#36824;&#26159;&#22833;&#36133;&#65289;
+</span>  (<span style="color: #ffa348; font-weight: bold;">when</span> (<span style="color: #ffa348; font-weight: bold;">and</span> new-cookie (not (equal? new-cookie cookie)))
+    (session-cookie-set! new-cookie))
+  ...)
+</code></pre>
+</div>
+
+<p>
+因为 <code>http-get</code> 本身是无状态的，当前会话必须由我们自己保存：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> *session* (list <span style="color: #5bc8af;">""</span>))
+(<span style="color: #ffa348; font-weight: bold;">define</span> session-mutex (make-mutex))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (session-cookie)
+  (with-mutex session-mutex (car *session*)))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (session-cookie-set! cookie)
+  (with-mutex session-mutex (set-car! *session* cookie)))
+</code></pre>
+</div>
+
+<p>
+这里用了最简单的一格盒子（一个元素的列表）加互斥锁。虽然默认是单线程请求，但并发是
+可调的，所以共享状态该上锁还是得上锁。
+</p>
+</div>
+</div>
+<div id="outline-container-org86fb1e1" class="outline-3">
+<h3 id="org86fb1e1"><span class="section-number-3">7.2.</span> 200不等于成功</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+这是整个程序里最坑的一条。
+</p>
+
+<p>
+第一版的判断只有一句 <code>(if (equal? 200 (response-code stat)) body (quit 2))</code> 。而办事
+大厅的网关在扛不住请求的时候，会返回一个**状态码200**的页面，页面里写着“温馨提示：
+凭证已失效，请重新登录！”。于是这个错误页被当成正常数据一路传到后面：解析出来是空表
+格，这一周就被静悄悄地丢掉了，最后生成一个不完整、却不报任何错的日历。
+</p>
+
+<p>
+实测中，一次请求20周的数据，只有3周拿到了真正的课表。
+</p>
+
+<p>
+所以判断一次请求是否成功，不能只看状态码，还要看内容对不对：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (bad-body-reason body)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#36820;&#22238;&#20004;&#20010;&#20540;&#65306;(&#22833;&#36133;&#21407;&#22240; &#26159;&#21542;&#26159;&#8220;&#36523;&#20221;/&#20250;&#35805;&#8221;&#38382;&#39064;)&#12290;
+</span>  <span style="color: #656565;">;; </span><span style="color: #656565;">&#31532;&#19968;&#20010;&#20540;&#20026; #f &#34920;&#31034; body &#30475;&#36215;&#26469;&#23601;&#26159;&#27491;&#24120;&#30340;&#35838;&#34920;&#39029;&#12290;
+</span>  (<span style="color: #ffa348; font-weight: bold;">cond</span> ((not (string? body)) (values <span style="color: #5bc8af;">"&#21709;&#24212;&#20869;&#23481;&#19981;&#26159;&#25991;&#26412;"</span> #f))
+        ((string-null? body) (values <span style="color: #5bc8af;">"&#21709;&#24212;&#20869;&#23481;&#20026;&#31354;"</span> #f))
+        ((find (<span style="color: #ffa348; font-weight: bold;">lambda</span> (marker) (string-contains-ci body marker)) http-error-markers)
+         =&gt; (<span style="color: #ffa348; font-weight: bold;">lambda</span> (marker)
+              (values (format #f <span style="color: #5bc8af;">"&#26381;&#21153;&#22120;&#36820;&#22238;&#20102;&#38169;&#35823;&#39029;&#38754;&#65288;&#21547;&#26377;&#12300;~a&#12301;&#65289;&#65292;cookie &#21487;&#33021;&#24050;&#36807;&#26399;"</span>
+                              marker)
+                      #t)))
+        ((not (<span style="color: #ffa348; font-weight: bold;">or</span> (string-contains-ci body <span style="color: #5bc8af;">"&lt;table"</span>)
+                  (string-contains-ci body <span style="color: #5bc8af;">"&lt;tbody"</span>)))
+         <span style="color: #656565;">;; </span><span style="color: #656565;">&#27491;&#24120;&#35838;&#34920;&#39029;&#19968;&#23450;&#20250;&#24102;&#34920;&#26684;&#65292;&#27809;&#26377;&#34920;&#26684;&#22810;&#21322;&#26159;&#34987;&#37325;&#23450;&#21521;&#21040;&#30331;&#24405;&#39029;&#20102;
+</span>         (values <span style="color: #5bc8af;">"&#21709;&#24212;&#37324;&#27809;&#26377;&#35838;&#34920;&#34920;&#26684;&#65288;&#21487;&#33021;&#34987;&#37325;&#23450;&#21521;&#21040;&#30331;&#24405;&#39029;&#65289;"</span> #t))
+        (<span style="color: #ffa348; font-weight: bold;">else</span> (values #f #f))))
+</code></pre>
+</div>
+
+<p>
+第二个返回值很关键：它区分“像是身份问题”和“像是网络问题”。前者连续出现几次就该放
+弃，后者值得多试几次。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb93bdce" class="outline-3">
+<h3 id="orgb93bdce"><span class="section-number-3">7.3.</span> 并发与重试</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+第一版为了让cookie不过期，一股脑把请求全发出去：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(chain (stream-&gt;list uri-strm)
+       (par-map handle-uri _)
+       (list-&gt;stream _))
+</code></pre>
+</div>
+
+<p>
+20周就是20个线程同时打过去。对学校的网关来说，同一个会话的并发请求会互相“踢下
+线”，于是大部分请求只能拿到上面那个错误页——这正好解释了为什么成功的几周是随机分
+布的。
+</p>
+
+<p>
+现在的默认策略是**一次一个**，并且把“分块”和“并发”分开：把周次列表切成 <code>jobs</code> 份，
+每份内部严格串行，份与份之间才并发。这样即使用户把 <code>jobs</code> 调大，也不会出现“同一个
+会话同时有几十个请求在飞”的情况。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (chunk-list lst n)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#25226;&#21015;&#34920;&#23613;&#37327;&#24179;&#22343;&#22320;&#20998;&#25104; n &#20221;&#65288;&#27599;&#20221;&#20869;&#37096;&#20018;&#34892;&#65292;&#20221;&#19982;&#20221;&#20043;&#38388;&#24182;&#21457;&#65289;
+</span>  (<span style="color: #ffa348; font-weight: bold;">if</span> (<span style="color: #ffa348; font-weight: bold;">or</span> (&lt;= n 1) (&lt;= (length lst) 1))
+      (list lst)
+      (<span style="color: #ffa348; font-weight: bold;">let</span> ((size (max 1 (ceiling (/ (length lst) n)))))
+        (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((rest lst) (acc '()))
+          (<span style="color: #ffa348; font-weight: bold;">if</span> (null? rest)
+              (reverse acc)
+              (loop (list-tail rest (min size (length rest)))
+                    (cons (list-head rest size) acc)))))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (fetch-all-weeks pairs jobs)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-pair pair)
+    (request-delay!)                     <span style="color: #656565;">; </span><span style="color: #656565;">&#20004;&#27425;&#35831;&#27714;&#20043;&#38388;&#20572;&#19968;&#19979;
+</span>    (list (fetch-one-week (car pair) (cdr pair))))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-chunk group)
+    (concatenate (<span style="color: #ffa348; font-weight: bold;">map</span> handle-pair group)))
+  (<span style="color: #ffa348; font-weight: bold;">if</span> (&lt;= jobs 1)
+      (concatenate (<span style="color: #ffa348; font-weight: bold;">map</span> handle-chunk (chunk-list pairs 1)))
+      (concatenate (par-map handle-chunk (chunk-list pairs jobs)))))
+</code></pre>
+</div>
+
+<p>
+重试的间隔指数增长，并且加一点随机抖动，免得并发时几次重试又撞在一起：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (fetch-one-week uri week)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#24102;&#37325;&#35797;&#30340;&#25235;&#21462;&#65306;&#25104;&#21151;&#36820;&#22238; HTML &#23383;&#31526;&#20018;&#65292;&#24443;&#24213;&#22833;&#36133;&#36820;&#22238;&#31354;&#20018;&#65288;&#24182;&#35760;&#24405;&#19979;&#26469;&#65289;
+</span>  (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((attempt 1)
+             (wait http-retry-delay))
+    (<span style="color: #ffa348; font-weight: bold;">let*</span> ((result (try-fetch-week uri))
+           (ok? (assoc-ref result 'ok))
+           (reason (assoc-ref result 'reason)))
+      (<span style="color: #ffa348; font-weight: bold;">cond</span>
+       (ok?
+        (note-auth-success!)
+        (assoc-ref result 'body))
+       ((&gt;= attempt http-retries)
+        (format (current-error-port)
+                <span style="color: #5bc8af;">"&#35686;&#21578;&#65306;&#31532; ~a &#21608;&#23581;&#35797; ~a &#27425;&#21518;&#20173;&#28982;&#22833;&#36133;&#65306;~a~%"</span> week http-retries reason)
+        (record-failure! week reason)
+        <span style="color: #5bc8af;">""</span>)
+       (<span style="color: #ffa348; font-weight: bold;">else</span>
+        <span style="color: #656565;">;; </span><span style="color: #656565;">&#27599;&#27425;&#22833;&#36133;&#37117;&#35760;&#19968;&#31508;&#65292;&#36830;&#32493;&#22826;&#22810;&#27425;&#8220;&#20687;&#26159; cookie &#22833;&#25928;&#8221;&#23601;&#30452;&#25509;&#36864;&#20986;
+</span>        (<span style="color: #ffa348; font-weight: bold;">when</span> (assoc-ref result 'auth)
+          (note-auth-failure! reason))
+        (usleep (inexact-&gt;exact (round (* wait 1000000))))
+        (loop (1+ attempt)
+              (min 10.0 (* wait 2 (+ 1.0 (/ (random 500) 1000.0))))))))))
+</code></pre>
+</div>
+
+<p>
+再配上一个“失败计数器”：如果连续若干次拿到的都是“凭证已失效”，说明cookie本身没用了，
+这时候继续一周一周地重试只是浪费时间，不如直接报错退出，让使用者去重新登录、抓一个新
+的 <code>JSESSIONID</code> 。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (note-auth-failure! reason)
+  (<span style="color: #ffa348; font-weight: bold;">let*</span> ((threshold (<span style="color: #ffa348; font-weight: bold;">if</span> (&gt; http-jobs 1)
+                        (* http-max-auth-failures http-jobs)
+                        http-max-auth-failures))
+         (count (with-mutex report-mutex
+                  (<span style="color: #ffa348; font-weight: bold;">set!</span> *auth-failures* (1+ *auth-failures*))
+                  *auth-failures*)))
+    (<span style="color: #ffa348; font-weight: bold;">when</span> (&gt;= count threshold)
+      (format (current-error-port)
+              <span style="color: #5bc8af;">"~%&#38169;&#35823;&#65306;&#36830;&#32493; ~a &#27425;&#35831;&#27714;&#25343;&#21040;&#30340;&#37117;&#26159;&#26381;&#21153;&#22120;&#30340;&#38169;&#35823;&#39029;&#65288;&#26368;&#21518;&#19968;&#27425;&#65306;~a&#65289;&#12290;~%~
+               &#36825;&#36890;&#24120;&#26159; cookie(JSESSIONID) &#24050;&#36807;&#26399;&#25110;&#26080;&#25928;&#12290;~%~
+               &#35831;&#37325;&#26032;&#30331;&#24405;&#26234;&#24935;&#27743;&#36130; / &#24494;&#20449;&#21150;&#20107;&#22823;&#21381;&#65292;&#25235;&#19968;&#20010;&#26368;&#26032;&#30340; JSESSIONID &#20877;&#35797;&#12290;~%"</span>
+              count reason)
+      (quit 2))))
+</code></pre>
+</div>
+
+<p>
+最后，抓取失败的周次要单独记下来，在结尾统一报告。**这一步不能省**：如果程序只是
+“尽力而为”地生成日历而不告诉你缺了哪几周，使用者会以为日历是完整的，然后在某天早上
+错过一节课。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (report-failures file)
+  (<span style="color: #ffa348; font-weight: bold;">let</span> ((failures (failed-weeks)))
+    (<span style="color: #ffa348; font-weight: bold;">unless</span> (null? failures)
+      (format (current-error-port)
+              <span style="color: #5bc8af;">"~%&#35686;&#21578;&#65306;&#26377; ~a &#21608;&#27809;&#26377;&#25235;&#21040;&#25968;&#25454;&#65292;&#29983;&#25104;&#30340;&#26085;&#21382;&#26159;&#19981;&#23436;&#25972;&#30340;&#65281;~%"</span> (length failures))
+      (<span style="color: #ffa348; font-weight: bold;">for-each</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (failure)
+                  (format (current-error-port) <span style="color: #5bc8af;">"  &#31532; ~a &#21608;&#65306;~a~%"</span>
+                          (car failure) (cdr failure)))
+                (reverse failures))
+      (format (current-error-port)
+              <span style="color: #5bc8af;">"  &#21487;&#20197;&#31245;&#21518;&#37325;&#26032;&#36816;&#34892;&#19968;&#27425;&#65292;&#25110;&#32773;&#29992;&#26356;&#23567;&#30340;&#21608;&#27425;&#33539;&#22260;&#20998;&#25209;&#29983;&#25104;&#12290;~%"</span>))))
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4d03e8f" class="outline-3">
+<h3 id="org4d03e8f"><span class="section-number-3">7.4.</span> 超时</h3>
+<div class="outline-text-3" id="text-7-4">
+<p>
+超时不能不做，否则网关偶尔卡住会让整个程序挂死。
+</p>
+
+<p>
+Guile 里常用的做法是把请求丢到另一个线程里，然后 <code>(join-thread thread timeout)</code> 。
+但是要注意：**这个timeout不会真的等待那么久**，实测它是立刻返回的，相当于轮询。所以
+做超时得自己轮询：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (fetch-with-timeout thunk timeout)
+  (<span style="color: #ffa348; font-weight: bold;">let*</span> ((slot (make-mutex))
+         (result #f)
+         (thread (call-with-new-thread
+                  (<span style="color: #ffa348; font-weight: bold;">lambda</span> ()
+                    (<span style="color: #ffa348; font-weight: bold;">let</span> ((value (catch #t
+                                   (<span style="color: #ffa348; font-weight: bold;">lambda</span> ()
+                                     (cons 'ok (call-with-values thunk list)))
+                                   (<span style="color: #ffa348; font-weight: bold;">lambda</span> (key . args)
+                                     (cons 'exception (cons key args))))))
+                      (with-mutex slot (<span style="color: #ffa348; font-weight: bold;">set!</span> result value)))))))
+    (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((waited 0.0))
+      (<span style="color: #ffa348; font-weight: bold;">let</span> ((value (with-mutex slot result)))
+        (<span style="color: #ffa348; font-weight: bold;">cond</span> (value value)
+              ((&gt;= waited timeout)
+               (cancel-thread thread)
+               (list 'timeout))
+              (<span style="color: #ffa348; font-weight: bold;">else</span>
+               (usleep 100000)
+               (loop (+ waited 0.1))))))))
+</code></pre>
+</div>
+
+<p>
+这里还顺手用 <code>catch</code> 把子线程里抛出的异常打包回来，否则子线程一崩，主线程只会一直等
+到一个永远不会出现的值。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org41689f0" class="outline-2">
+<h2 id="org41689f0"><span class="section-number-2">8.</span> 第三阶段：把HTML变成带标签的数据</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-orge80beee" class="outline-3">
+<h3 id="orge80beee"><span class="section-number-3">8.1.</span> 转成SHTML</h3>
+<div class="outline-text-3" id="text-8-1">
 <div class="org-src-container">
 <pre class="src src-plain"><code>produce-shtml ::= Stream html -&gt; Stream shtml
 </code></pre>
@@ -525,21 +1004,18 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 </p>
 </div>
 </div>
-<div id="outline-container-org29b3795" class="outline-3">
-<h3 id="org29b3795"><span class="section-number-3">7.2.</span> 第二步：选择数据</h3>
-<div class="outline-text-3" id="text-7-2">
+<div id="outline-container-org9dd8451" class="outline-3">
+<h3 id="org9dd8451"><span class="section-number-3">8.2.</span> 选行与选格子</h3>
+<div class="outline-text-3" id="text-8-2">
 <p>
 对于存在表中的数据，我们主要需要的是表中的数据，而由于学校在处理课表数据时可能出
 现的错误以及表本身的复杂性，我们需要一个DSL语言来辅助完成选择的过程。
 </p>
 
 <p>
-这里隆重介绍XML与HTML元素选择器库： <code>(sxml xpath)</code> 。
-</p>
-
-<p>
-这个库中包含着一个可以将特定列表展开为一个函数的特殊的函数： <code>sxpath</code> 。有了这个
-函数的帮助，我们得以实现编写较少的代码实现复杂的选择功能。
+这里隆重介绍XML与HTML元素选择器库： <code>(sxml xpath)</code> 。这个库中包含着一个可以将特定
+列表展开为一个函数的特殊的函数： <code>sxpath</code> 。有了这个函数的帮助，我们得以实现编写较
+少的代码实现复杂的选择功能。
 </p>
 
 <div class="org-src-container">
@@ -548,211 +1024,221 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 </div>
 
 <p>
-这是这个函数的基本用法，而在这个项目中，其具体代码如下：
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>((sxpath '(html body html body div table tbody tr)) _)
-</code></pre>
-</div>
-
-<p>
-组合为符合格式的代码即为：
+课表页的表格里，一行是一节课，一格里是若干 <code>&lt;ul&gt;</code> ，课程信息就在 <code>&lt;ul&gt;</code> 里面。所以先
+把行选出来：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (select-data shtml-strm)
-  (<span style="color: #ffa348; font-weight: bold;">let</span> ((path '(html body html body div table tbody tr)))
-    (stream-map (sxpath path) shtml-strm)))
+  (stream-map (<span style="color: #ffa348; font-weight: bold;">lambda</span> (shtml)
+                (<span style="color: #ffa348; font-weight: bold;">let</span> ((rows ((sx:sxpath select-data-path) shtml)))
+                  <span style="color: #656565;">;; </span><span style="color: #656565;">&#34892;&#25968;&#20026; 0 &#35828;&#26126;&#36825;&#19968;&#21608;&#26412;&#26469;&#23601;&#27809;&#25235;&#21040;&#65288;&#21069;&#38754;&#24050;&#32463;&#25253;&#21578;&#36807;&#65289;&#65292;
+</span>                  <span style="color: #656565;">;; </span><span style="color: #656565;">&#26377;&#34892;&#25968;&#20294;&#19981;&#22815;&#25165;&#35828;&#26126;&#34920;&#26684;&#26679;&#23376;&#21464;&#20102;&#65292;&#20540;&#24471;&#25552;&#37266;&#12290;
+</span>                  (<span style="color: #ffa348; font-weight: bold;">when</span> (<span style="color: #ffa348; font-weight: bold;">and</span> (pair? rows) (&lt; (length rows) periods-per-day))
+                    (format (current-error-port)
+                            <span style="color: #5bc8af;">"&#35686;&#21578;&#65306;&#36825;&#19968;&#21608;&#30340;&#34920;&#26684;&#21482;&#26377; ~a &#34892;&#65288;&#24212;&#26377; ~a &#34892;&#65289;&#65292;&#25968;&#25454;&#21487;&#33021;&#19981;&#23436;&#25972;~%"</span>
+                            (length rows) periods-per-day))
+                  rows))
+              shtml-strm))
 </code></pre>
 </div>
-</div>
-</div>
-<div id="outline-container-org163e3d3" class="outline-3">
-<h3 id="org163e3d3"><span class="section-number-3">7.3.</span> 第三步：打上标签</h3>
-<div class="outline-text-3" id="text-7-3">
+
 <p>
-这一步至关重要，给中间数据打上标签才可以让数据携带方便后续处理为ICS事件的信息。
-而对于事件的中间表示，可以简单一些，甚至这个时候可以选择不解析课程消息字符串，而
-留着以后解析。
+再从一个格子里把课程信息抠出来。这里要处理一个细节： <code>&lt;ul&gt;</code> 里面的文字可能被拆成好几
+段（HTML源里的换行、缩进都会变成独立的文本节点），所以不能直接取第一个字符串，要把
+子节点里的文字全部收集起来再拼：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (node-text node)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#25226;&#19968;&#20010;&#33410;&#28857;&#19979;&#25152;&#26377;&#30340;&#25991;&#23383;&#25340;&#36215;&#26469;&#65288;&#20363;&#22914; &lt;ul&gt; &#37324;&#30340;&#35838;&#31243;&#20449;&#24687;&#65289;
+</span>  (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((lst (cdr node))
+             (parts '()))
+    (<span style="color: #ffa348; font-weight: bold;">cond</span> ((null? lst) (string-join (reverse parts) <span style="color: #5bc8af;">" "</span>))
+          ((string? (car lst))
+           (<span style="color: #ffa348; font-weight: bold;">let</span> ((text (string-trim-both (car lst))))
+             (loop (cdr lst) (<span style="color: #ffa348; font-weight: bold;">if</span> (string-null? text) parts (cons text parts)))))
+          (<span style="color: #ffa348; font-weight: bold;">else</span> (loop (cdr lst) parts)))))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (cell-info-list cell)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#19968;&#20010;&#26684;&#23376;&#37324;&#21487;&#33021;&#26377;&#19968;&#38376;&#35838;&#65292;&#20063;&#21487;&#33021;&#26377;&#22909;&#20960;&#38376;&#65288;&#37325;&#20462;&#12289;&#21333;&#21452;&#21608;&#31561;&#65289;&#65292;&#20840;&#37096;&#21462;&#20986;&#26469;
+</span>  (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((uls ((sx:sxpath info-cell-path) cell))
+             (acc '()))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (null? uls)
+        (reverse acc)
+        (<span style="color: #ffa348; font-weight: bold;">let</span> ((text (node-text (car uls))))
+          (loop (cdr uls)
+                (<span style="color: #ffa348; font-weight: bold;">if</span> (string-null? text) acc (cons text acc)))))))
+</code></pre>
+</div>
+
+<p>
+注意 <code>cell-info-list</code> 返回的是一个**列表**而不是一个字符串。一个格子里放两门课是完全
+可能的（比如重修班和单双周），第一版只取第一个，白白丢掉了另一半课。
+</p>
+</div>
+</div>
+<div id="outline-container-org411daa4" class="outline-3">
+<h3 id="org411daa4"><span class="section-number-3">8.3.</span> 打标签</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+这一步至关重要，给中间数据打上标签才可以让数据携带方便后续处理为ICS事件的信息。而
+对于事件的中间表示，可以简单一些，甚至这个时候可以选择不解析课程消息字符串，而留着
+以后解析。
 </p>
 
 <p>
 经历上一步的处理，我们成功的把数据选择出来了，但是这个情况下的数据是shtml节点集，
-无法直接使用，这一步主要是再次使用 <code>sxpath</code> 函数来选择所需数据，并将数据根据周次
-以及时间顺序打上标签。
+无法直接使用，这一步主要是把数据和它所在的周次、星期几、第几节绑在一起：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (label-nodes node-strm week-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day node day)
-    (cons day
-          (<span style="color: #ffa348; font-weight: bold;">let</span> ((raw-data ((sxpath '(ul (*text* 2))) node)))
-            (<span style="color: #ffa348; font-weight: bold;">if</span> (null? raw-data)
-                #f
-                (string-term-both (car raw-data))))))
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time node time)
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day cell day)
+    (cons day (cell-info-list cell)))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time row time)
     (cons time
           (<span style="color: #ffa348; font-weight: bold;">map</span> handle-day
-               ((filter (sxpath '(@ valign *text*))) node)
-               (iota 7))))
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-node-set node week)
+               ((sx:sxpath time-path) row)
+               (iota days-per-week))))
+  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-node-set node-set week)
     (cons week
-          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-time node (iota 12))))
+          <span style="color: #656565;">;; </span><span style="color: #656565;">map &#20250;&#25353;&#36739;&#30701;&#30340;&#37027;&#20010;&#25130;&#26029;&#65292;&#25152;&#20197;&#34892;&#25968;&#19981;&#22815;&#26102;&#19981;&#20250;&#20986;&#38169;
+</span>          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-time node-set (iota periods-per-day))))
   (stream-map handle-node-set node-strm week-strm))
 </code></pre>
 </div>
 
 <p>
-经过这个函数的处理，原始的shtml数据就被处理为一个便于解析的值了。后续的函数在编
-写时，可以较为方便的处理这些值。
+经过这个函数的处理，原始的shtml数据就被处理为一个便于解析的值了，形状是
+=(周 . ((节 . ((星期 . 课程信息列表) &hellip;)) &hellip;))=。后续的函数在编写时，可以较为方便
+地处理这些值。
 </p>
 </div>
 </div>
-<div id="outline-container-orgcea0189" class="outline-3">
-<h3 id="orgcea0189"><span class="section-number-3">7.4.</span> 第四步：转化为事件的中间表示</h3>
-<div class="outline-text-3" id="text-7-4">
+</div>
+<div id="outline-container-org4b2c5b8" class="outline-2">
+<h2 id="org4b2c5b8"><span class="section-number-2">9.</span> 第四阶段：事件的中间表示与合并</h2>
+<div class="outline-text-2" id="text-9">
 <p>
-另外，在这个阶段，我们不聚合数据，也就是说，一个具有三个连续课时的课程，在现在的
-表示方法下，是三个独立的课程。
+在这个阶段，我们不聚合数据，也就是说，一个具有三个连续课时的课程，在现在的表示方法
+下，是三个独立的课程。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-plain"><code>Entry ::= List ( class-info-str,
-                 week-of-semester,
-                 day-of-week,
-                 time-of-day,
-                 duration )
+<pre class="src src-plain"><code>Entry ::= ( 课程信息字符串 周次 星期几 第几节 连续几节 )
 </code></pre>
 </div>
 
 <p>
-这一步的主要挑战是，如何把原数据中，周数、时间、周几的顺序处理为上述数据结构的顺
-序。为了达成这个目标，我们可以定义辅助函数：
+比起用下标去取，先写一组访问器会让后面的代码好读很多：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-entry info-str w d t)
   (list info-str w d t 1))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-info entry) (list-ref entry 0))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-week entry) (list-ref entry 1))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-day entry) (list-ref entry 2))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-time entry) (list-ref entry 3))
+(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-length entry) (list-ref entry 4))
 </code></pre>
 </div>
 
 <p>
-在有了这个函数之后，我们应该如何处理数据呢？
+这里要说明一下索引的基准，因为它是后面所有计算的地基：**周次从1开始，星期从0开始
+（0是周一），节次从0开始。**第一版就是在这里翻了车——周次是1开始，偏移量却乘了
+<code>w</code> ，于是整张日历晚了一周。
 </p>
-
-<p>
-这里的难点在于，需要处理的数据类型是一个嵌套的类型，在使用 <code>map</code> 函数进行映射的
-时候无法直接把标签的值传入处理函数中。
-</p>
-
-<p>
-我们知道，在Scheme编程语言中，常常可以听到“闭包可以捕获环境中的变量”或者类似的
-描述，当我们有了捕获环境变量的能力的时候，我们就可以通过闭包捕获的形式把函数包含
-在其中。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event label-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week-time-list-pair)
-    (<span style="color: #ffa348; font-weight: bold;">let</span> ((week (car week-time-list-pair))
-          (time-list (cdr week-time-list-pair)))
-      (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time time-day-list-pair)
-        (<span style="color: #ffa348; font-weight: bold;">let</span> ((time (car time-day-list-pair))
-              (day-list (cdr time-day-list-pair)))
-          (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day day-info-pair)
-            (<span style="color: #ffa348; font-weight: bold;">let</span> ((day (car day-info-pair))
-                  (info (cdr day-info-pair)))
-              (make-entry info week day time)))
-          (<span style="color: #ffa348; font-weight: bold;">map</span> handle-day day-list)))
-      (<span style="color: #ffa348; font-weight: bold;">map</span> handle-time time-list)))
-  (stream-map handle-week label-strm))
-</code></pre>
 </div>
-
+<div id="outline-container-org0469877" class="outline-3">
+<h3 id="org0469877"><span class="section-number-3">9.1.</span> 为什么要规定生成顺序</h3>
+<div class="outline-text-3" id="text-9-1">
 <p>
-我相信有能力的读者一眼发现了一些问题，嵌套深度达到了惊人的7层，这在实践中是不提
-倡的，由此，我们需要拆分层层嵌套的函数，即便其写的长一些也可以。
+生成事件的时候，最容易忽略的是**顺序**。第一版的生成顺序是*周 -&gt; 第几节 -&gt; 星期几*，
+于是同一门课连着上的几节之间隔着其它天的课，永远凑不到一起，一门三节的课被拆成三个
+事件。改成*周 -&gt; 星期几 -&gt; 第几节*之后，相邻的节次才能合并。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event label-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-day week time)
-    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (day-info-pair)
-      (<span style="color: #ffa348; font-weight: bold;">let</span> ((day (car day-info-pair))
-            (info (cdr day-info-pair)))
-        (make-entry info week day time))))
-
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-time week)
-    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (time-day-list-pair)
-      (<span style="color: #ffa348; font-weight: bold;">let</span> ((time (car time-day-list-pair))
-            (day-list (cdr time-day-list-pair)))
-        (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-day week time) day-list))))
-
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-entry label-strm)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#27880;&#24847;&#29983;&#25104;&#39034;&#24207;&#26159; &#21608; -&gt; &#26143;&#26399;&#20960; -&gt; &#31532;&#20960;&#33410;&#12290;
+</span>  <span style="color: #656565;">;; </span><span style="color: #656565;">&#36825;&#26679;&#21516;&#19968;&#38376;&#35838;&#36830;&#30528;&#30340;&#20960;&#33410;&#22312;&#27969;&#37324;&#23601;&#26159;&#30456;&#37051;&#30340;&#65292;&#21518;&#38754;&#30340;&#21512;&#24182;&#25165;&#33021;&#29983;&#25928;&#12290;
+</span>  (<span style="color: #ffa348; font-weight: bold;">define</span> (entries-of-day week by-time day)
+    (<span style="color: #ffa348; font-weight: bold;">let</span> loop ((time 0) (rest by-time) (acc '()))
+      (<span style="color: #ffa348; font-weight: bold;">if</span> (null? rest)
+          acc
+          (<span style="color: #ffa348; font-weight: bold;">let*</span> ((day-list (car rest))
+                 (hit (assq day day-list))
+                 (infos (<span style="color: #ffa348; font-weight: bold;">if</span> hit (cdr hit) '())))
+            (loop (1+ time)
+                  (cdr rest)
+                  (append acc
+                          (<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (info) (make-entry info week day time))
+                               infos)))))))
   (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-week week-time-list-pair)
-    (<span style="color: #ffa348; font-weight: bold;">let</span> ((week (car week-time-list-pair))
-          (time-list (cdr week-time-list-pair)))
-      (chain (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-time week) time-list)
-             (list-&gt;stream _))))
-
+    (<span style="color: #ffa348; font-weight: bold;">let*</span> ((week (car week-time-list-pair))
+           <span style="color: #656565;">;; </span><span style="color: #656565;">by-time &#30340;&#31532; i &#39033;&#26159;&#31532; i &#33410;&#35838;&#37027;&#19968;&#34892;&#30340;&#25968;&#25454;
+</span>           (by-time (<span style="color: #ffa348; font-weight: bold;">map</span> cdr (cdr week-time-list-pair))))
+      (list-&gt;stream
+       (append-map (<span style="color: #ffa348; font-weight: bold;">lambda</span> (day) (entries-of-day week by-time day))
+                   (iota days-per-week)))))
   (chain label-strm
          (stream-map handle-week _)
          (stream-concat _)))
 </code></pre>
 </div>
-
-<p>
-像这样，通过函数应用来传递变量来拆分嵌套程序是可行的，这样做，可以让程序分层清晰。
-</p>
 </div>
 </div>
-<div id="outline-container-org04d34ba" class="outline-3">
-<h3 id="org04d34ba"><span class="section-number-3">7.5.</span> 第五步：筛选与整合</h3>
-<div class="outline-text-3" id="text-7-5">
+<div id="outline-container-org19d4b93" class="outline-3">
+<h3 id="org19d4b93"><span class="section-number-3">9.2.</span> 合并的判据</h3>
+<div class="outline-text-3" id="text-9-2">
 <p>
-这一步主要是处理数据流中表示“无课”的条目，以及可以合并为一节课的条目。
-</p>
-
-<p>
-首先是筛选，由于之前我们对字符串的存在做了从表到假值或字符串的映射因此这里的代码
-可以简单一些：
+首先是筛选，信息字符串为空或者为假值的条目就是“没课”：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (filter-entry entry-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (not-empty entry)
-    (car entry))
-  (stream-filter not-empty entry-strm))
+  (stream-filter (<span style="color: #ffa348; font-weight: bold;">lambda</span> (entry)
+                   (<span style="color: #ffa348; font-weight: bold;">let</span> ((info (entry-info entry)))
+                     (<span style="color: #ffa348; font-weight: bold;">and</span> info (string? info) (not (string-null? info)))))
+                 entry-strm))
 </code></pre>
 </div>
 
 <p>
-其次是整合，对于课程的整合，首先看两个课程是否在可以整合的时间段，比如，第1-5节
-课是可以整合的，而对于分别处于第五节，和第六节的课，无论如何也无法聚合。再就是看
-课程信息字符串是否是一个字符串。
+其次是整合。合并的判断必须严格，四条同时满足才算：
+</p>
+
+<ol class="org-ol">
+<li>同一门课（信息字符串相同）；</li>
+<li>同一周的同一个星期几；</li>
+<li>第二节正好接在第一节后面（ <code>t2 = t1 + len1</code> ，中间不能缺节次）；</li>
+<li>它们属于配置里允许合并的同一个时段。</li>
+</ol>
+
+<p>
+第4条很容易被忽略。学校的课表里，上午第5节和下午第6节在表格上是相邻的两格，如果不
+加时段约束，程序会把11:35下课和14:00上课的两门课“焊”成一节从11:35上到15:35的课。
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (entry-mergable? entry1 entry2)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-each-list entry)
-    (<span style="color: #ffa348; font-weight: bold;">lambda</span> (mergable-list)
-      (<span style="color: #ffa348; font-weight: bold;">if</span> (member (cadddr entry) mergable-list)
-          #t
-          #f)))
-  (<span style="color: #ffa348; font-weight: bold;">if</span> (<span style="color: #ffa348; font-weight: bold;">or</span> (null? entry1) (null? entry2))
-      #f
-      (chain (values (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-each-list entry1) mergable-time-list)
-                     (<span style="color: #ffa348; font-weight: bold;">map</span> (handle-each-list entry2) mergable-time-list))
-             (<span style="color: #ffa348; font-weight: bold;">map</span> (<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">and</span> a b)) _ _)
-             (reduce (<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">or</span> a b)) #f _)
-             ((<span style="color: #ffa348; font-weight: bold;">lambda</span> (a b) (<span style="color: #ffa348; font-weight: bold;">and</span> a b)) _ (equal? (car entry1)
-                                                 (car entry2))))))
+  (<span style="color: #ffa348; font-weight: bold;">and</span> (equal? (entry-info entry1) (entry-info entry2))
+       (equal? (entry-week entry1) (entry-week entry2))
+       (equal? (entry-day entry1) (entry-day entry2))
+       (= (entry-time entry2) (+ (entry-time entry1) (entry-length entry1)))
+       (any (<span style="color: #ffa348; font-weight: bold;">lambda</span> (group)
+              (<span style="color: #ffa348; font-weight: bold;">and</span> (memv (entry-time entry1) group)
+                   (memv (entry-time entry2) group)))
+            mergable-time-list)))
 </code></pre>
 </div>
 
 <p>
-以上代码中 <code>mergable-time-list</code> 是提前定义的，表示可以合并的时间的列表的列表。这
-么说可能有点拗口，以下是这个数据项的一个示例：
+以上代码中 <code>mergable-time-list</code> 是提前定义的，表示可以合并的时间的列表的列表。这么
+说可能有点拗口，以下是这个数据项的一个示例：
 </p>
 
 <div class="org-src-container">
@@ -764,11 +1250,44 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 </div>
 
 <p>
-在一个列表中的数字代表着这两个事件是可以合并的。
+在一个列表中的数字代表着这些节次之间是可以合并的。注意这里是节次的下标（从0开
+始），所以 <code>(0 1 2 3 4)</code> 对应的是第1节到第5节。
+</p>
+</div>
+</div>
+<div id="outline-container-org208f202" class="outline-3">
+<h3 id="org208f202"><span class="section-number-3">9.3.</span> 沿着流折叠</h3>
+<div class="outline-text-3" id="text-9-3">
+<p>
+合并的思路是沿着流折叠：把“已经合并好的最后一个事件”和“下一个事件”比较，能合就合，
+不能合就把新的放进去。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (merge-entry event1 event2)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#21512;&#24182;&#23601;&#26159;&#25226;&#12300;&#36830;&#32493;&#20960;&#33410;&#12301;&#21152;&#19968;&#65292;&#24320;&#22987;&#33410;&#27425;&#36824;&#26159;&#31532;&#19968;&#33410;
+</span>  (list-update 1+ event1 4))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (merge-entries entry-strm)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#27839;&#30528;&#27969;&#25240;&#21472;&#65306;&#27599;&#20010;&#26032;&#26465;&#30446;&#21644;&#12300;&#24050;&#32463;&#21512;&#24182;&#22909;&#30340;&#26368;&#21518;&#19968;&#20010;&#26465;&#30446;&#12301;&#27604;&#36739;
+</span>  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry seed next)
+    (<span style="color: #ffa348; font-weight: bold;">cond</span> ((stream-null? seed) (stream-cons next seed))
+          ((entry-mergable? (stream-car seed) next)
+           (stream-cons (merge-entry (stream-car seed) next)
+                        (stream-cdr seed)))
+          (<span style="color: #ffa348; font-weight: bold;">else</span>
+           (stream-cons next seed))))
+  (stream-fold handle-entry stream-null entry-strm))
+</code></pre>
+</div>
+
+<p>
+注意 <code>stream-fold</code> 的处理器收到的是 <code>(累加值 新元素)</code> ，而这里的累加值本身就是一个
+流，流的头部就是最后放进去的那个事件，所以才叫 <code>seed</code> 和 <code>next</code> 。
 </p>
 
 <p>
-如果这两个事件是可以合并的，那么就构造新的事件：
+<code>list-update</code> 是一个“按下标改写列表某一项”的小工具，用来把“连续几节”这个字段加一：
 </p>
 
 <div class="org-src-container">
@@ -784,69 +1303,45 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
               (car post)
               (cdr post)
               (1+ curr-pos)))))
-
-(<span style="color: #ffa348; font-weight: bold;">define</span> (event-merge event1 event2)
-  (list-update 1+ event1 4))
 </code></pre>
 </div>
 
 <p>
-构建新事件实际上就是把原来事件的第四项也就是课时数增加1。
-</p>
-
-<p>
-在构建新事件时，应该创建一个新流，不应该在原有流的基础上进行修改，因为目前没有可
-以实现类似功能的函数，只有 <code>stream-fold</code> 函数配合构建新流的函数才能产生我们需要
-的数据。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (merge-entry entry-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry seed next)
-    (<span style="color: #ffa348; font-weight: bold;">cond</span> ((stream-null? seed) (stream-cons next seed))
-          ((entry-mergable? (stream-car seed) next)
-           (stream-cons (entry-merge (stream-car seed next))
-                        (stream-cdr seed)))
-          (<span style="color: #ffa348; font-weight: bold;">else</span>
-           (stream-cons next seed))))
-  (stream-fold handle-entry stream-null strm))
-</code></pre>
-</div>
-
-<p>
-在合并好之后，就可以进行下一步了。
+顺带说一句：因为累加值是靠 <code>stream-cons</code> 往前塞的，所以 <code>merge-entries</code> 输出的流其
+实和输入是**反序**的，最终写进ICS的事件是从晚到早排列的<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>。RFC里VEVENT的顺序
+没有意义，所以不影响使用；但如果以后要在这一步之后做别的处理，记得这一点。
 </p>
 </div>
 </div>
-<div id="outline-container-org5900388" class="outline-3">
-<h3 id="org5900388"><span class="section-number-3">7.6.</span> 第六步：转变为最终表示</h3>
-<div class="outline-text-3" id="text-7-6">
+</div>
+<div id="outline-container-org41b7dfd" class="outline-2">
+<h2 id="org41b7dfd"><span class="section-number-2">10.</span> 第五阶段：算时间</h2>
+<div class="outline-text-2" id="text-10">
+</div>
+<div id="outline-container-org7c90d4c" class="outline-3">
+<h3 id="org7c90d4c"><span class="section-number-3">10.1.</span> 开始时间</h3>
+<div class="outline-text-3" id="text-10-1">
 <p>
-这一步是重构整个事件，使其更容易处理。
-</p>
-
-<p>
-一个事件，至少需要两个部分，一个是开始时间，一个是结束时间<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>。对于这两个元素，
-都可以从上一个阶段中构建的事件的中间表示中通过计算获取。开始时间需要通过周数，天
-数，开始课时时间来计算，而结束时间需要开始时间加上时间间隔，而时间间隔比较好算，
-这里不做陈述。
+一个事件至少需要开始时间和结束时间。开始时间要通过周数、星期几、第几节来计算：
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-duration-from-start w d t)
-  (make-time time-duration
-             (+ (* w 604800)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#20174;&#23398;&#26399;&#31532;&#19968;&#22825;&#31639;&#36215;&#30340;&#20559;&#31227;&#65306;&#25972;&#21608; + &#25972;&#22825;&#30340;&#31186;&#25968; + &#36825;&#19968;&#22825;&#31532; t &#33410;&#35838;&#30340;&#24320;&#22987;&#26102;&#38388;
+</span>  (make-time time-duration 0
+             (+ (* (1- w) 604800)
                 (* 86400 d)
                 (lookup-time t))))
 </code></pre>
 </div>
 
 <p>
-其中 <code>lookup-time</code> 函数可以从全局的设置中查找 <code>t</code> 对应的相对于天的偏移量。
+其中 <code>lookup-time</code> 函数从全局的设置中查找 <code>t</code> 对应的相对于一天的偏移量。周次要减
+一，因为“第1周的偏移”是0。
 </p>
 
 <p>
-有了相对于开始时间的时间间隔我们就可以将这个时间间隔加到开始时间来计算开始时间了。
+有了偏移量，把它加到开始日期上就得到绝对时间：
 </p>
 
 <div class="org-src-container">
@@ -854,177 +1349,357 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
   (add-duration (date-&gt;time-tai start-date) duration))
 </code></pre>
 </div>
+</div>
+</div>
+<div id="outline-container-org320d244" class="outline-3">
+<h3 id="org320d244"><span class="section-number-3">10.2.</span> 结束时间要查表，不要套公式</h3>
+<div class="outline-text-3" id="text-10-2">
+<p>
+第一版的结束时间是套公式算的： <code>n*45分钟 + (n-1)*15分钟</code> ，也就是每两节之间留15分钟
+课间。
+</p>
 
 <p>
-而计算结束时间相对简单：
+这个公式是错的。真实的课间并不整齐：大多数相邻两节之间只有5分钟，但第2节之后和第7节
+之后各有20分钟，中午和傍晚更是整段空出来（分别是100分钟和70分钟）。用公式硬算，两
+节连堂会算成15:45（实际15:35），三节连堂会算成10:45（实际10:40）——误差只有几分钟
+到十几分钟，而且是“看起来挺合理”的误差，很难被发现。
+</p>
+
+<p>
+正确的做法是查表：既然已经有每一节的开始时间表，那第n节的下课时间就是“第n节的开始时
+间加一节课的长度”：
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-duration-of-class class-length)
-  (make-time time-duration
-             (+ (* class-length 2700)
-                (* (- class-length 1) 900))))
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (calc-end-offset w d t length)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">&#32467;&#26463;&#26102;&#38388; = &#26368;&#21518;&#19968;&#33410;&#35838;&#30340;&#24320;&#22987;&#26102;&#38388; + &#19968;&#33410;&#35838;&#30340;&#38271;&#24230;
+</span>  (<span style="color: #ffa348; font-weight: bold;">let</span> ((last-period (+ t (1- length))))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (&gt;= last-period (vector-length class-table-data))
+        (error <span style="color: #5bc8af;">"&#35838;&#34920;&#26102;&#38388;&#34920;&#37324;&#27809;&#26377;&#36825;&#19968;&#33410;"</span> last-period)
+        (make-time time-duration 0
+                   (+ (* (1- w) 604800)
+                      (* 86400 d)
+                      (lookup-time last-period)
+                      on-class-length)))))
 </code></pre>
 </div>
 
 <p>
-甚至有一部分代码可以复用上面的代码。
+顺手加了一个越界检查：如果合并之后的最后一节超出了时间表的长度，说明配置和现实对不上
+了，这种时候应该直接报错，而不是安静地算出一个不存在的时间。
 </p>
-
+</div>
+</div>
+</div>
+<div id="outline-container-org4ad1e86" class="outline-2">
+<h2 id="org4ad1e86"><span class="section-number-2">11.</span> 第六阶段：生成ICS</h2>
+<div class="outline-text-2" id="text-11">
+</div>
+<div id="outline-container-org904f433" class="outline-3">
+<h3 id="org904f433"><span class="section-number-3">11.1.</span> 属性名</h3>
+<div class="outline-text-3" id="text-11-1">
 <p>
-当然，为了方便处理，字符串也需要重构为一个关联列表<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>，这里我选择使用正则表达
-式库来辅助拆分字符串。
+ICS是一堆 <code>KEY:VALUE</code> 的行。属性用GOOPS对象来表示：
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (prase-info-str-to-alist info-str)
-  (<span style="color: #ffa348; font-weight: bold;">let*</span> ((regex <span style="color: #5bc8af;">"^(.*) (.*)\\((.*) (.*)\\)$"</span>)
-         (full-match (string-match regex info-str))
-         (class-name (match:substring full-match 1))
-         (teacher-name (match:substring full-match 2))
-         (including-week (match:substring full-match 3))
-         (location (match:substring full-match 4)))
-    (chain '()
-           (acons 'class-name class-name _)
-           (acons 'teacher-name teacher-name _)
-           (acons 'including-week including-week _)
-           (acons 'location location _)
-           (acons 'full-string info-str _))))
-</code></pre>
-</div>
-
-<p>
-有了这些函数，我们终于可以构建最终的中间表示了。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (produce-event entry-strm start-date)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-entry entry)
-    (<span style="color: #ffa348; font-weight: bold;">let*</span> ((info-str (list-ref entry 0))
-           (info-alist (prase-info-str-to-alist info-str))
-           (week (list-ref entry 1))
-           (day (list-ref entry 2))
-           (time (list-ref entry 3))
-           (duration (list-ref entry 4))
-           (start-offset (calc-duration-from-start week day time))
-           (end-offset (calc-duration-of-class duration))
-           (start-time (calc-time start-date start-offset))
-           (end-time (add-duration start-time end-offset)))
-      (chain info-alist
-             (acons 'start-time start-time _)
-             (acons 'end-time end-time _))))
-  (stream-map handle-entry))
-</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div id="outline-container-org7420fad" class="outline-2">
-<h2 id="org7420fad"><span class="section-number-2">8.</span> 第四阶段：转化为ICS事件</h2>
-<div class="outline-text-2" id="text-8">
-<p>
-这个阶段就比较直接，把日期和时间记录转化为一个UTC时间字符串，之后按照之前的解析
-数据组合为描述字符串即可。
-</p>
-
-<div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (date-&gt;utc-string date)
-  (date-&gt;string date <span style="color: #5bc8af;">"~Y~m~dT~H~M~SZ"</span>))
-(<span style="color: #ffa348; font-weight: bold;">define</span> (time-tai-&gt;utc-string time)
-  (date-&gt;utc-string (time-tai-&gt;date time 0)))
-
-(<span style="color: #ffa348; font-weight: bold;">define</span> (date-&gt;rtime-string date)
-  (date-&gt;string date <span style="color: #5bc8af;">"~Y~m~dT~H~M~S"</span>))
-(<span style="color: #ffa348; font-weight: bold;">define</span> (time-tai-&gt;rtime-string time)
-  (date-&gt;rtime-string (time-tai-&gt;date time)))
-
-(<span style="color: #ffa348; font-weight: bold;">define</span> (make-prop key val . param)
-  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-property&gt;</span> <span style="color: #7d8ac7;">#:type</span> key
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-prop key val . param)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-property&gt;</span> <span style="color: #7d8ac7;">#:name</span> key
         <span style="color: #7d8ac7;">#:value</span> val
         <span style="color: #7d8ac7;">#:parameters</span> (<span style="color: #ffa348; font-weight: bold;">if</span> (pair? param) (car param) '())))
+</code></pre>
+</div>
 
-(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vevent-from-event uid dtstart dtend sum des . rest)
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vevent-from-event uid dtstart dtend sum des loc vala)
   (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:name</span> <span style="color: #5bc8af;">"VEVENT"</span>
         <span style="color: #7d8ac7;">#:properties</span>
-        (cons* (make-prop <span style="color: #5bc8af;">"UID"</span> uid)
-               (make-prop <span style="color: #5bc8af;">"DTSTAMP"</span> (date-&gt;utc-string (current-date 0)))
-               (make-prop <span style="color: #5bc8af;">"DTSTART"</span> dtstart)
-               (make-prop <span style="color: #5bc8af;">"DTEND"</span> dtend)
-               (make-prop <span style="color: #5bc8af;">"SUMMARY"</span> sum)
-               (make-prop <span style="color: #5bc8af;">"DESCRITPION"</span> des)
-               rest)))
-
-(<span style="color: #ffa348; font-weight: bold;">define</span> (to-ics-vevent event-strm)
-  (<span style="color: #ffa348; font-weight: bold;">define</span> (handle-event event)
-    (<span style="color: #ffa348; font-weight: bold;">define</span> (make-uid start-time)
-      (time-tai-&gt;rtime-string start-time))
-    (<span style="color: #ffa348; font-weight: bold;">define</span> (make-description class-name
-                              teacher-name
-                              including
-                              location
-                              full-str)
-      (string-append
-       <span style="color: #5bc8af;">"&#35838;&#31243;&#21517;&#31216;&#65306;"</span> class-name <span style="color: #5bc8af;">"\n"</span>
-       <span style="color: #5bc8af;">"&#25945;&#24072;&#21517;&#31216;&#65306;"</span> teacher-name <span style="color: #5bc8af;">"\n"</span>
-       <span style="color: #5bc8af;">"&#21253;&#25324;&#21608;&#27425;&#65306;"</span> including-name <span style="color: #5bc8af;">"\n"</span>
-       <span style="color: #5bc8af;">"&#19978;&#35838;&#20301;&#32622;&#65306;"</span> location <span style="color: #5bc8af;">"\n"</span>
-       <span style="color: #5bc8af;">"&#21407;&#22987;&#25968;&#25454;&#65306;"</span> full-str)
-      )
-    (<span style="color: #ffa348; font-weight: bold;">let</span> ((class-name (assoc-ref event 'class-name))
-          (teacher-name (assoc-ref event 'teacher-name))
-          (including (assoc-ref event 'including-week))
-          (location (assoc-ref event 'location))
-          (full-str (assoc-ref event 'full-string))
-          (start-time (assoc-ref event 'start-time))
-          (end-time (assoc-ref event 'end-time)))
-      (make-vevent-from-event (make-uid start-time)
-                              (time-tai-&gt;rtime-string start-time)
-                              (time-tai-&gt;rtime-string end-time)
-                              class-name
-                              (make-description class-name
-                                                teacher-name
-                                                including
-                                                location
-                                                full-str))))
-  (stream-map handle-event event-strm))
+        (list (make-prop <span style="color: #5bc8af;">"UID"</span> uid)
+              (make-prop <span style="color: #5bc8af;">"DTSTAMP"</span> (date-&gt;utc-string (current-date 0)))
+              (make-prop <span style="color: #5bc8af;">"DTSTART"</span> dtstart)
+              (make-prop <span style="color: #5bc8af;">"DTEND"</span> dtend)
+              (make-prop <span style="color: #5bc8af;">"SUMMARY"</span> sum)
+              (make-prop <span style="color: #5bc8af;">"DESCRIPTION"</span> des)
+              (make-prop <span style="color: #5bc8af;">"LOCATION"</span> loc))
+        <span style="color: #7d8ac7;">#:components</span>
+        (list vala)))
 </code></pre>
 </div>
 
 <p>
-而创建好ics事件之后，就是着手把ics事件包装为一个ics日历：
+写完文件之后**一定要拿真的日历软件导一次**。属性名拼错的时候，日历软件往往不是忽略
+那一行，而是整个文件都不肯导入，而且没有任何提示——只会表现为“没反应”。第一版把
+<code>VCALENDAR</code> 拼成了 <code>VCALENDER</code> 、把 <code>DESCRIPTION</code> 拼成了 <code>DESCRITPION</code> ，这两个错
+误各自都能让成果完全不可用。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vcal vevents . rest)
-  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:type</span> <span style="color: #5bc8af;">"VCALENDER"</span>
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vcal vevents)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:name</span> <span style="color: #5bc8af;">"VCALENDAR"</span>
         <span style="color: #7d8ac7;">#:properties</span>
-        (cons* (prop <span style="color: #5bc8af;">"VERSION"</span> <span style="color: #5bc8af;">"2.0"</span>)
-               (prop <span style="color: #5bc8af;">"PRODID"</span> juxfe-prodid)
-               rest)
-        <span style="color: #7d8ac7;">#:components</span>
-        vevents))
+        (list (make-prop <span style="color: #5bc8af;">"VERSION"</span> <span style="color: #5bc8af;">"2.0"</span>)
+              (make-prop <span style="color: #5bc8af;">"PRODID"</span> jxufe-prodid)
+              (make-prop <span style="color: #5bc8af;">"CALSCALE"</span> <span style="color: #5bc8af;">"GREGORIAN"</span>))
+        <span style="color: #7d8ac7;">#:components</span> vevents))
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb4f0d93" class="outline-3">
+<h3 id="orgb4f0d93"><span class="section-number-3">11.2.</span> UID</h3>
+<div class="outline-text-3" id="text-11-2">
+<p>
+<code>UID</code> 有两件事要同时满足：唯一，而且**每次运行都一样**。否则重新生成一次日历，软件
+会认为所有课都是新事件，于是同一门课出现两遍、三遍。
+</p>
 
-(<span style="color: #ffa348; font-weight: bold;">define</span> (warp-in-calender vevent-strm)
-  (make-vcal (stream-&gt;list vevent-strm)))
+<p>
+用“开始时间 + 课程名的散列”正好满足这两条：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-uid start-time class-name)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">UID &#24517;&#39035;&#21807;&#19968;&#32780;&#19988;&#27599;&#27425;&#36816;&#34892;&#37117;&#19968;&#26679;&#65292;&#19981;&#28982;&#26085;&#21382;&#20250;&#37325;&#22797;&#23548;&#20837;
+</span>  (string-append (time-tai-&gt;rtime-string start-time)
+                 <span style="color: #5bc8af;">"-"</span>
+                 (number-&gt;string (hash class-name 1000000000))
+                 <span style="color: #5bc8af;">"@jxufe.edu.cn"</span>))
 </code></pre>
 </div>
 
 <p>
-到了这一步，我们终于可以真正的把我们生成的所有的数据整个写入文件了。
+同一门课、同一个时间，每次生成的UID都相同，日历软件会正确地覆盖而不是新增。
+</p>
+</div>
+</div>
+<div id="outline-container-orge839b8b" class="outline-3">
+<h3 id="orge839b8b"><span class="section-number-3">11.3.</span> LOCATION与VALARM</h3>
+<div class="outline-text-3" id="text-11-3">
+<p>
+课程字符串里本来就有教室，只是第一版没有把它单独拎出来。多写一行 <code>LOCATION</code> ，日历
+软件就能在事件上直接显示教室：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (make-vala tri act des)
+  (make <span style="color: #5bc8af; font-weight: bold;">&lt;ics-object&gt;</span> <span style="color: #7d8ac7;">#:name</span> <span style="color: #5bc8af;">"VALARM"</span>
+        <span style="color: #7d8ac7;">#:properties</span>
+        (list (make-prop <span style="color: #5bc8af;">"TRIGGER"</span> tri)
+              (make-prop <span style="color: #5bc8af;">"ACTION"</span> act)
+              (make-prop <span style="color: #5bc8af;">"DESCRIPTION"</span> des))))
+</code></pre>
+</div>
+
+<p>
+<code>VALARM</code> 就是“按时提醒”本身——毕竟这才是我们绕这么大一圈的初衷。提醒时间写在配置
+里，目前是提前15分钟。
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (write-to-file vcal output-port)
-  (scm-&gt;ics output-port))
+  (ics-object-&gt;ics vcal output-port))
+
+(<span style="color: #ffa348; font-weight: bold;">define</span> (in-chain-write-to-file vcal file)
+  (<span style="color: #ffa348; font-weight: bold;">let</span> ((port (open-output-file file <span style="color: #7d8ac7;">#:encoding</span> <span style="color: #5bc8af;">"UTF-8"</span>)))
+    (dynamic-wind
+        (<span style="color: #ffa348; font-weight: bold;">lambda</span> () #t)
+        (<span style="color: #ffa348; font-weight: bold;">lambda</span> () (write-to-file vcal port))
+        (<span style="color: #ffa348; font-weight: bold;">lambda</span> () (close-port port))))
+  vcal)
+</code></pre>
+</div>
+
+<p>
+写文件的时候用 <code>dynamic-wind</code> 保证端口一定会被关掉，即使中途出错也不会留下一个没写完
+的文件。
+</p>
+</div>
+</div>
+<div id="outline-container-org117c20e" class="outline-3">
+<h3 id="org117c20e"><span class="section-number-3">11.4.</span> 关于时间的格式</h3>
+<div class="outline-text-3" id="text-11-4">
+<p>
+<code>DTSTART</code> 和 <code>DTEND</code> 用的是不带时区的“浮动时间”<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (date-&gt;rtime-string date)
+  (date-&gt;string date <span style="color: #5bc8af;">"~Y~m~dT~H~M~S"</span>))
+</code></pre>
+</div>
+
+<p>
+不带时区的意思是“就按当地墙上钟的时间来”，这正好是我们想要的——不管手机在哪，上课时
+间就是课表上的时间。国内不实行夏令时，所以这个做法没有隐患；如果哪天要给实行夏令时的
+地区用，就必须改成带 <code>TZID</code> 或UTC的形式。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org082a6d7" class="outline-2">
+<h2 id="org082a6d7"><span class="section-number-2">12.</span> 这些坑是怎么发现的</h2>
+<div class="outline-text-2" id="text-12">
+<p>
+上面提到的每一条，都是真的被坑过之后改的。汇总一下：
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">现象</th>
+<th scope="col" class="org-left">原因</th>
+<th scope="col" class="org-left">对策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">日历缺好几周，程序却一声不吭</td>
+<td class="org-left">网关扛不住时返回200 + “凭证已失效”错误页</td>
+<td class="org-left">除了状态码还要看内容：错误字样、有没有表格</td>
+</tr>
+
+<tr>
+<td class="org-left">成功的周次是随机分布的</td>
+<td class="org-left">同一会话的并发请求互相踢下线</td>
+<td class="org-left">默认串行，失败指数退避重试</td>
+</tr>
+
+<tr>
+<td class="org-left">一门三节的课被拆成三个事件</td>
+<td class="org-left">事件生成顺序是周→节→天，连堂课不相邻</td>
+<td class="org-left">改成周→天→节</td>
+</tr>
+
+<tr>
+<td class="org-left">整张日历晚一周</td>
+<td class="org-left">周次从1开始，偏移却乘了 w</td>
+<td class="org-left">乘 (1- w)</td>
+</tr>
+
+<tr>
+<td class="org-left">下课时间差十几分钟</td>
+<td class="org-left">课间长短不一（多为5分钟，第2、7节后为20分钟），公式算错了</td>
+<td class="org-left">查时间表，取最后一节开始时间加一节课长度</td>
+</tr>
+
+<tr>
+<td class="org-left">老师名被切成半个、课程名带括号就切错</td>
+<td class="org-left">贪婪正则 <code>^(.*) (.*)\((.*) (.*)\)$</code></td>
+<td class="org-left">从最后一个括号切，前半段按第一个空格分</td>
+</tr>
+
+<tr>
+<td class="org-left">日历软件“没反应”，不导入</td>
+<td class="org-left"><code>VCALENDER</code> / <code>DESCRITPION</code> 拼错</td>
+<td class="org-left">写完拿真的日历软件导一次</td>
+</tr>
+
+<tr>
+<td class="org-left">重新生成一次，课就多出一遍</td>
+<td class="org-left">UID每次都不一样</td>
+<td class="org-left">UID用“开始时间 + 课程名散列”</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+顺便把拆课程信息字符串这件事说清楚。单元格里的字符串形如：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plain"><code>计算机网络 蒋剑(2-17 麦三教3107)
+专业英语听力I(中澳) David High(2-5 麦三教3215)
+</code></pre>
+</div>
+
+<p>
+课程名本身可能带括号，老师名里可能有空格，所以贪婪正则
+<code>^(.*) (.*)\((.*) (.*)\)$</code> 会切错。可行的做法是从最后一个左括号处切开，括号里按第一
+个空格分出周次和地点，括号外的部分按第一个空格分出课程名和老师：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span style="color: #ffa348; font-weight: bold;">define</span> (split-info-str info-str)
+  <span style="color: #656565;">;; </span><span style="color: #656565;">"&#35745;&#31639;&#26426;&#32593;&#32476; &#33931;&#21073;(2-17 &#40614;&#19977;&#25945;3107)"
+</span>  <span style="color: #656565;">;;   </span><span style="color: #656565;">-&gt; &#35838;&#31243;&#21517; "&#35745;&#31639;&#26426;&#32593;&#32476;"&#12289;&#25945;&#24072; "&#33931;&#21073;"&#12289;&#21608;&#27425; "2-17"&#12289;&#22320;&#28857; "&#40614;&#19977;&#25945;3107"
+</span>  (<span style="color: #ffa348; font-weight: bold;">define</span> (split-first-space str)
+    (<span style="color: #ffa348; font-weight: bold;">let</span> ((space (string-index str #\space)))
+      (<span style="color: #ffa348; font-weight: bold;">if</span> space
+          (values (string-trim-both (substring str 0 space))
+                  (string-trim-both (substring str (1+ space))))
+          (values (string-trim-both str) <span style="color: #5bc8af;">""</span>))))
+  (<span style="color: #ffa348; font-weight: bold;">let*</span> ((open (string-rindex info-str #\())
+         (close (string-rindex info-str #\))))
+    (<span style="color: #ffa348; font-weight: bold;">if</span> (<span style="color: #ffa348; font-weight: bold;">or</span> (not open) (not close) (&lt; close open))
+        <span style="color: #656565;">;; </span><span style="color: #656565;">&#26684;&#24335;&#19981;&#35748;&#35782;&#30340;&#26102;&#20505;&#21035;&#35753;&#31243;&#24207;&#23849;&#25481;&#65292;&#25972;&#20018;&#24403;&#35838;&#31243;&#21517;
+</span>        (values info-str <span style="color: #5bc8af;">""</span> <span style="color: #5bc8af;">""</span> info-str)
+        (<span style="color: #ffa348; font-weight: bold;">let*</span> ((inside (string-trim-both (substring info-str (1+ open) close)))
+               (head (string-trim-both (substring info-str 0 open))))
+          (<span style="color: #ffa348; font-weight: bold;">let-values</span> (((including-week location) (split-first-space inside))
+                       ((class-name teacher-name) (split-first-space head)))
+            (values class-name teacher-name including-week location))))))
 </code></pre>
 </div>
 </div>
-</div>
-<div id="outline-container-orge200ad7" class="outline-2">
-<h2 id="orge200ad7"><span class="section-number-2">9.</span> 总结</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-org990c11e" class="outline-3">
+<h3 id="org990c11e"><span class="section-number-3">12.1.</span> 留一份能复现问题的测试</h3>
+<div class="outline-text-3" id="text-12-1">
 <p>
-这就是整个程序了。此程序中应用了许多程序编写技巧，包括嵌套优化，流的构造等。
+上面这些问题有一个共同特点：**它们都需要真的连上学校的网关才会出现**，而cookie会过
+期，网关的行为也不稳定，靠手工复现非常痛苦。
+</p>
+
+<p>
+所以排错最有效的办法是把“坏掉的服务器”搬到自己机器上。项目里有一个
+=test/mock-server.scm=，就是一个假的网关，它可以模拟几种真实的坏行为：
+</p>
+
+<ul class="org-ul">
+<li><code>ok</code> ：正常返回课表；</li>
+<li><code>concur</code> ：只要同一个session同时有两个以上请求在飞，就返回“凭证已失效”错误页
+（这就是真实网关把程序搞挂的行为）；</li>
+<li><code>random</code> ：随机抽风；</li>
+<li><code>rotate</code> ：每次响应都换发新的 <code>JSESSIONID</code> ，旧的不再被接受（用来验证程序会不会跟
+着更新cookie）。</li>
+</ul>
+
+<p>
+再加一个 <code>test/run-tests.sh</code> ，把几个场景串起来跑一遍：串行抓取要全部成功、连堂课要
+合并成08:00-10:40、午休两侧（11:35和14:00）不许合并、cookie失效要快速报错退出、
+离线重放的结果要和联网一致。
+</p>
+
+<p>
+有了它，改代码之后不用拿到真的cookie也能知道有没有改坏。这套测试在重构过程中抓出了
+上面表格里将近一半的问题——尤其是“合并”那一条，靠肉眼是绝对看不出来的。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3930704" class="outline-2">
+<h2 id="org3930704"><span class="section-number-2">13.</span> 总结</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+这就是整个程序了。此程序中应用了许多程序编写技巧，包括嵌套优化、流的构造，以及
+“把错误当成一等公民”——第一版最大的问题不是某个函数写错了，而是 <b>它对失败不
+敏感</b> ：服务器返回错误页它当成数据，抓不到的周次它默默跳过，写出来的文件格式不对
+它也不吭声。整个程序从头到尾没有一个地方会告诉使用者“我失败了”。
+</p>
+
+<p>
+所以这次重构之后，我加的代码里有一大半是在处理“如果这里出错了怎么办”：校验响应内容、
+记录失败周次、连续失败就退出、检查开始日期是不是周一、检查表格行数够不够。这些代码
+不产生任何功能，但它们决定了这个程序能不能被信任。
 </p>
 
 <p>
@@ -1037,12 +1712,23 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 <div id="text-footnotes">
 
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-当然，如果可以，此处应该是一个时间间隔，而不是一个时刻。可是由于许多日历
-软件对于标准实现不统一，这个方法实际不可行。
+顺便一提，这个载荷解出来是课表详情页的地址，而学校自己的URL里就把Schedule拼
+成了 <code>Chedule</code> 。这是学校的笔误，不是我们的bug，照着抄就行，不要“顺手改对”。
 </p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-如果有读者尝试，也可以将其更改为一个记录而不是简单的关联列表。
+更友好的做法是接受任意日期，然后自己算出那一周的周一。现在只是给出警告，因为
+“第1周的周一”这个说法本身就依赖学校的校历，与其猜错不如让使用者确认。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+反序是“往流头塞元素”的折叠写法带来的，不是有意为之。
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+严格的RFC 5545还要求一行不超过75个字节，超长的行要用CRLF加一个空格折起来。
+<code>(ics)</code> 库不做折行，实测我们生成的文件里最长的一行有248字节。主流日历软件都能容
+忍，所以暂时不处理；如果哪天遇到挑剔的客户端，这就是第一个要查的地方。
 </p></div></div>
 
 
@@ -1051,7 +1737,7 @@ cookie信息，而是直接将此参数的值与 <code>JSEESIONID</code> 进行�
 <div id="postamble" class="status">
 <p class="date">&#26085;&#26399;: 2026-09-07 一 00:00</p>
 <p class="author">&#20316;&#32773;: 维修部部长</p>
-<p class="date">Created: 2026-09-11 五 16:24</p>
+<p class="date">Created: 2026-09-15 二 17:01</p>
 </div>
 </body>
 </html>

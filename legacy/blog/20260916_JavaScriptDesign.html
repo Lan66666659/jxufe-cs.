@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+<!-- 2026-09-22 二 13:28 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JavaScript设计赏析</title>
+<meta name="author" content="维修部部长" />
+<meta name="generator" content="Org Mode" />
+
+<script src="lodash.min.js"></script>
+<script src="prev-post-builder.js"></script>
+<script src="footnote-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">JavaScript设计赏析</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&#30446;&#24405;</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgc1fbbff">1. 综述</a></li>
+<li><a href="#orgbf30b1f">2. C系语法</a></li>
+<li><a href="#orga3be14f">3. 基于原型链的面向对象</a></li>
+<li><a href="#orgb8a2f02">4. 函数式编程支持</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc1fbbff" class="outline-2">
+<h2 id="orgc1fbbff"><span class="section-number-2">1.</span> 综述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+布兰登・艾奇，这是个传奇人物，他有什么贡献呢？他用10天时间，把JavaScript带到了这
+个世界上，其语言之精妙，以至于到今天，JavaScript还在被用作网页编程的语言。我们可
+以看到，这个语言有很多设计十分具有“个性”，它有各种编程范式的各种特性，令人震惊
+得是其究竟如何在语法上把这些特性融合到一起的。
+</p>
+
+<p>
+今天我就给出一些我欣赏的一些设计，希望可以给读者一些启发。
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf30b1f" class="outline-2">
+<h2 id="orgbf30b1f"><span class="section-number-2">2.</span> C系语法</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+如果读到这里的读者学过C，同时也学过一点JavaScript，你就会发现这两个有多相似：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><code><span style="color: #ffa348; font-weight: bold;">for</span> (<span style="color: #5bc8af; font-weight: bold;">int</span> i = 0; i &lt; 10; i++)
+  {
+    printf(<span style="color: #5bc8af;">"%d"</span>, i);
+  }
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">const</span> printf = console.log; <span style="color: #656565;">// </span><span style="color: #656565;">&#33267;&#23569;&#36825;&#26679;&#30475;&#36215;&#26469;&#26159;&#37027;&#20040;&#22238;&#20107;&#12290;
+</span>
+<span style="color: #ffa348; font-weight: bold;">for</span> (<span style="color: #ffa348; font-weight: bold;">var</span> i = 0; i &lt; 10; i++)
+{
+    printf(i);
+}
+</code></pre>
+</div>
+
+<p>
+几乎很多语法是符合C程序的直觉的，大花括号，分号结尾等等，这些语法特性给了
+JavaScript灵活的代码布局能力，编写者可以随意的折行。
+</p>
+</div>
+</div>
+<div id="outline-container-orga3be14f" class="outline-2">
+<h2 id="orga3be14f"><span class="section-number-2">3.</span> 基于原型链的面向对象</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+这是JavaScript设计的一个亮点，即通过原型链构建的继承体系。
+</p>
+
+<p>
+所谓原型链，就是对象的原型指向一个对象，并以此延伸的链条，如果一个源对象是对象的
+原型，那么在调用对象的属性的时候，其会同时在此对象没有搜索到条目的时候在源对象中
+搜索。
+</p>
+
+<p>
+这个设计模式一开始是self语言提出的，后来JavaScript吸收了这部分设计模式，并使用这
+个设计模式构建出自己的面向对象编程模式。
+</p>
+
+<p>
+一个比较经典的例子就是继承的实现：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">function</span> Person(age)
+{
+    <span style="color: #7d8ac7;">this</span>.age = age;
+}
+
+Person.exchangeAge = <span style="color: #ffa348; font-weight: bold;">function</span>(person1, person2)
+{
+    <span style="color: #ffa348; font-weight: bold;">const</span> temp = person2.age;
+    person2.age = person1.age;
+    person1.age = temp;
+}
+
+Person.<span style="color: #7d8ac7;">prototype</span>.getAge = <span style="color: #ffa348; font-weight: bold;">function</span> ()
+{
+    <span style="color: #ffa348; font-weight: bold;">return</span> <span style="color: #7d8ac7;">this</span>.age;
+}
+
+Person.<span style="color: #7d8ac7;">prototype</span>.setAge = <span style="color: #ffa348; font-weight: bold;">function</span> (newAge)
+{
+    <span style="color: #7d8ac7;">this</span>.age = newAge;
+}
+
+<span style="color: #ffa348; font-weight: bold;">function</span> prototypeInherit(SubType, SuperType)
+{
+    <span style="color: #ffa348; font-weight: bold;">const</span> prototype = Object.create(SuperType.<span style="color: #7d8ac7;">prototype</span>);
+    prototype.constructor = SubType;
+    SubType.<span style="color: #7d8ac7;">prototype</span> = prototype;
+}
+
+<span style="color: #ffa348; font-weight: bold;">function</span> PersonWithName(age, name)
+{
+    Person.call(<span style="color: #7d8ac7;">this</span>, age);
+    <span style="color: #7d8ac7;">this</span>.name = name;
+}
+
+PersonWithName.exchangeName = <span style="color: #ffa348; font-weight: bold;">function</span>(person1,person2)
+{
+    <span style="color: #ffa348; font-weight: bold;">const</span> temp = person2.name;
+    person2.name = person1.name;
+    person1.name = temp;
+}
+
+prototypeInherit(PersonWithName,Person);
+
+PersonWithName.<span style="color: #7d8ac7;">prototype</span>.getName = <span style="color: #ffa348; font-weight: bold;">function</span>()
+{
+    <span style="color: #ffa348; font-weight: bold;">return</span> <span style="color: #7d8ac7;">this</span>.name;
+}
+
+PersonWithName.<span style="color: #7d8ac7;">prototype</span>.setName = <span style="color: #ffa348; font-weight: bold;">function</span>(newName)
+{
+    <span style="color: #7d8ac7;">this</span>.name = newName;
+}
+</code></pre>
+</div>
+
+<p>
+代码中 <code>Type.call(this, args ...)</code> 和 <code>prototypeInherit</code> 函数就是实现继承的关键。
+其中 <code>Type.call</code> 把父类的所有属性都继承下来，而 <code>prototypeInherit</code> 是把所有的实
+例方法继承下来。而至于类方法，由于JavaScript是一个弱类型的语言，直接调用
+<code>Person</code> 类中的类函数即可。
+</p>
+
+<p>
+这个继承方式实际上就是现代JavaScript标准，即ES6中要求的 <code>class</code> 关键字的实现。
+</p>
+
+<p>
+当然，使用原型链也可以用其他方式满足“继承”：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">function</span> prototypeInherit(son, father)
+{
+    son.__proto__ = father;
+}
+
+<span style="color: #ffa348; font-weight: bold;">const</span> father = {a: 3, b: 4};
+<span style="color: #ffa348; font-weight: bold;">const</span> son = {c: 5, d: 6};
+prototypeInherit(son, father);
+son.a; <span style="color: #656565;">// </span><span style="color: #656565;">=&gt; 3</span>
+</code></pre>
+</div>
+
+<p>
+这个也可以称为“继承”，因为其把属性继承下来了，如果把一部分属性改成函数，那就是
+继承方法了，就是没有实现封装，所有的属性暴露在外面。具体这个到底是不是“正规的继
+承”，得看你怎么定义了。还有一个值得一提的事情是：现代浏览器的js实现默认js中的原
+型链是不会发生更改的，因此其采用了激进的优化手段，但是使用 <code>__proto__</code> 属性会使
+其回退至速度较低的原型链实现，导致性能大幅下降，因此请不要随意使用 <code>__proto__</code>
+属性。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8a2f02" class="outline-2">
+<h2 id="orgb8a2f02"><span class="section-number-2">4.</span> 函数式编程支持</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+JavaScript支持把函数作为一个值进行赋值、传递等等操作：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">const</span> handler = <span style="color: #ffa348; font-weight: bold;">function</span> (event) {
+    console.log(<span style="color: #5bc8af;">"hello"</span>);
+}
+
+document.addEventListener(<span style="color: #5bc8af;">"DOMContentLoaded"</span>, handler);
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">function</span> handler(event) {
+    console.log(<span style="color: #5bc8af;">"hello"</span>);
+}
+
+document.addEventListener(<span style="color: #5bc8af;">"DOMContentLoaded"</span>, handler);
+</code></pre>
+</div>
+
+<p>
+上面的两个用法效果相同，都是给DOM对象挂载一个函数，一旦DOM解析完成就执行这个函数。
+</p>
+
+<p>
+有了这个能力，一些函数式搭配更改值的小技巧也可以实现一个“函数式的状态”。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">function</span> makeState(val) {
+    <span style="color: #ffa348; font-weight: bold;">let</span> state = val;
+    <span style="color: #ffa348; font-weight: bold;">function</span> changeState(newVal) {
+        state = newVal;
+    }
+    <span style="color: #ffa348; font-weight: bold;">function</span> getState() {
+        <span style="color: #ffa348; font-weight: bold;">return</span> state;
+    }
+    <span style="color: #ffa348; font-weight: bold;">return</span> [getState, changeState];
+}
+</code></pre>
+</div>
+
+<p>
+这里，我们把一个值打包进一个“状态”，这个值会存储在这个函数的 <code>state</code> 变量中。
+</p>
+
+<p>
+乍一看，可能觉得疑惑：我既然可以直接使用变量来存储值，我到底为什么需要把这个变量
+放在一个闭包里边，用特定的函数来访问与更改？这就牵扯到了一个好玩的点了，我们可以
+依据这个实现一个“钩子函数”，一旦状态更新，我们就按照注册的钩子来更新值。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">function</span> makeState(val) {
+    <span style="color: #ffa348; font-weight: bold;">let</span> state = val;
+    <span style="color: #ffa348; font-weight: bold;">const</span> hooks = <span style="color: #ffa348; font-weight: bold;">new</span> <span style="color: #5bc8af; font-weight: bold;">Set</span>();
+
+    <span style="color: #ffa348; font-weight: bold;">function</span> addToHook(fn) {
+        <span style="color: #ffa348; font-weight: bold;">function</span> removeFromHook() {
+            hooks.<span style="color: #ffa348; font-weight: bold;">delete</span>(fn);
+        }
+
+        hooks.add(fn);
+        <span style="color: #ffa348; font-weight: bold;">return</span> removeFromHook;
+    }
+    <span style="color: #ffa348; font-weight: bold;">function</span> updateHooks(next, prev) {
+        <span style="color: #ffa348; font-weight: bold;">function</span> handleFn(fn) {
+            fn(next, prev);
+        }
+
+        <span style="color: #ffa348; font-weight: bold;">new</span> <span style="color: #5bc8af; font-weight: bold;">Set</span>(hooks)
+            .forEach(handleFn)
+    }
+    <span style="color: #ffa348; font-weight: bold;">function</span> changeState(newVal) {
+        <span style="color: #ffa348; font-weight: bold;">const</span> next =
+              <span style="color: #ffa348; font-weight: bold;">typeof</span> newVal === <span style="color: #5bc8af;">'function'</span> ?
+              newVal(state) :
+              newVal;
+
+        <span style="color: #ffa348; font-weight: bold;">if</span> (Object.is(next, state)) <span style="color: #ffa348; font-weight: bold;">return</span>;
+
+        <span style="color: #ffa348; font-weight: bold;">const</span> prev = state;
+        state = next;
+
+        updateHooks(next, prev);
+    }
+    <span style="color: #ffa348; font-weight: bold;">function</span> getState() {
+        <span style="color: #ffa348; font-weight: bold;">return</span> state;
+    }
+    <span style="color: #ffa348; font-weight: bold;">return</span> [getState, changeState, addToHook];
+}
+</code></pre>
+</div>
+
+<p>
+以上就是我们通过JavaScript的闭包特性以及值构建的状态函数。这个函数会返回一个具有
+三个函数的数组，通过解构我们可以分别获得这三个函数：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">let</span> [ getState, changeState, addToHook ] = makeState(1);
+</code></pre>
+</div>
+
+<p>
+有了这个三个函数，基本上就可以控制这个状态了，比如我想构建一个计数器：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js"><code><span style="color: #ffa348; font-weight: bold;">let</span> [ getState, changeState, addToHook ] = makeState(1);
+
+<span style="color: #ffa348; font-weight: bold;">let</span> btn = document.getElementById(<span style="color: #5bc8af;">"btn"</span>);
+<span style="color: #ffa348; font-weight: bold;">let</span> cnt = document.getElementById(<span style="color: #5bc8af;">"cnt"</span>);
+
+<span style="color: #ffa348; font-weight: bold;">function</span> updateCnt() {
+    cnt.innerText = getState().toString();
+}
+
+addToHook(updateCnt);
+updateCnt();
+
+<span style="color: #ffa348; font-weight: bold;">function</span> handleClick() {
+    changeState((curr) =&gt; curr + 1);
+}
+
+btn.addEventListener(<span style="color: #5bc8af;">'click'</span>, handleClick)
+</code></pre>
+</div>
+
+<p>
+上面的代码构建了一个状态，然后把更新计数器的函数作为钩子，一旦运行 <code>changeState</code>
+同时状态发生变化，就运行一次更新计数器的函数，之后把修改状态的函数挂载到按钮上，
+这样就可以构建一个计数器。
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">&#26085;&#26399;: 2026-09-16 三 00:00</p>
+<p class="author">&#20316;&#32773;: 维修部部长</p>
+<p class="date">Created: 2026-09-22 二 13:28</p>
+</div>
+</body>
+</html>
